@@ -1,0 +1,10 @@
+package com.ecolink.server.common;
+
+import java.util.List;
+
+public record PageResult<T>(
+        List<T> list,
+        int page,
+        int size,
+        long total
+) {}

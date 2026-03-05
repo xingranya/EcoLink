@@ -1,0 +1,30 @@
+{
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.jdt.ls.java.home": "E:\\JAVA\\jdk17",
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-17",
+            "path": "E:\\JAVA\\jdk17",
+            "default": true
+        }
+    ],
+    "maven.terminal.useJavaHome": true,
+    "maven.terminal.customEnv": [
+        {
+            "environmentVariable": "JAVA_HOME",
+            "value": "E:\\JAVA\\jdk17"
+        },
+        {
+            "environmentVariable": "Path",
+            "value": "E:\\JAVA\\jdk17\\bin;${env:Path}"
+        }
+    ],
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "/package.json"
+            ],
+            "url": "vscode://schemas/package"
+        }
+    ]
+}

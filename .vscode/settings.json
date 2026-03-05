@@ -26,5 +26,20 @@
             ],
             "url": "vscode://schemas/package"
         }
-    ]
+    ],
+    "terminal.integrated.defaultProfile.windows": "Git Bash",
+    "terminal.integrated.profiles.windows": {
+        "PowerShell": {
+            "source": "PowerShell",
+            "icon": "terminal-powershell"
+        },
+        "Command Prompt": {
+            "source": "Command Prompt",
+            "icon": "terminal-cmd"
+        },
+        "Git Bash": {
+            "source": "Git Bash",
+            "icon": "terminal-bash"
+        }
+    }
 }

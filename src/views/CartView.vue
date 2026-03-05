@@ -1,47 +1,121 @@
 <template>
-  <div class="page-shell">
+  <div class="min-h-screen bg-background-light text-slate-900">
     <AppHeader />
-    <main class="page-main">
-      <div class="section-head">
-        <div>
-          <h1 class="section-title">我的购物车</h1>
-          <p class="section-subtitle">确认商品后可直接创建演示订单</p>
+    <main class="mx-auto max-w-7xl px-4 py-8">
+      <div class="mb-8">
+        <div class="mx-auto flex max-w-3xl items-center justify-center">
+          <div class="flex flex-1 flex-col items-center gap-2">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-bold text-white shadow-lg shadow-primary/20">1</div>
+            <span class="text-sm font-bold text-primary">1. 查看购物车</span>
+          </div>
+          <div class="mb-6 h-[2px] w-24 bg-primary/20"></div>
+          <div class="flex flex-1 flex-col items-center gap-2">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-sm font-bold text-slate-500">2</div>
+            <span class="text-sm font-medium text-slate-400">2. 确认订单</span>
+          </div>
+          <div class="mb-6 h-[2px] w-24 bg-slate-200"></div>
+          <div class="flex flex-1 flex-col items-center gap-2">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-200 text-sm font-bold text-slate-500">3</div>
+            <span class="text-sm font-medium text-slate-400">3. 支付成功</span>
+          </div>
         </div>
-        <button class="btn btn-outline !px-3 !py-1.5" @click="toggleAll">
-          {{ selectedIds.length === cart.items.length ? '取消全选' : '全选' }}
-        </button>
       </div>
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
-        <section class="space-y-3">
-          <article v-for="item in cart.items" :key="item.id" class="surface-card flex items-center gap-3 p-4">
-            <input v-model="selectedIds" type="checkbox" :value="item.id" class="h-4 w-4 accent-primary" />
-            <img :src="item.productImage" class="h-20 w-20 rounded-xl object-cover" />
-            <div class="flex-1">
-              <p class="font-bold text-slate-900">{{ item.productName }}</p>
-              <p class="text-sm text-slate-500">¥{{ Number(item.price).toFixed(2) }}</p>
+
+      <div class="flex flex-col gap-8 lg:flex-row">
+        <section class="flex-grow space-y-4">
+          <div class="overflow-hidden rounded-xl border border-primary/5 bg-white shadow-sm">
+            <div class="flex items-center gap-4 border-b border-primary/5 bg-primary/5 p-4">
+              <input v-model="allSelected" class="h-5 w-5 rounded border-primary/30 text-primary focus:ring-primary" type="checkbox" @change="toggleAll" />
+              <h2 class="text-lg font-bold">购物车 ({{ cart.items.length }}件商品)</h2>
             </div>
-            <div class="flex items-center gap-2">
-              <button class="btn btn-outline !rounded-lg !px-2.5 !py-1" :disabled="actioningId === item.id" @click="changeQty(item.id, item.quantity - 1)">
-                -
-              </button>
-              <span>{{ item.quantity }}</span>
-              <button class="btn btn-outline !rounded-lg !px-2.5 !py-1" :disabled="actioningId === item.id" @click="changeQty(item.id, item.quantity + 1)">
-                +
-              </button>
+            <div class="divide-y divide-primary/5">
+              <article v-for="item in cart.items" :key="item.id" class="flex flex-wrap items-center gap-4 p-4 transition-colors hover:bg-primary/5 md:flex-nowrap">
+                <input v-model="selectedIds" :value="item.id" class="h-5 w-5 rounded border-primary/30 text-primary focus:ring-primary" type="checkbox" />
+                <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                  <img :src="item.productImage || fallbackImage" :alt="item.productName" class="h-full w-full object-cover" />
+                </div>
+                <div class="flex-grow">
+                  <RouterLink :to="`/product/${item.productId}`" class="font-bold text-slate-900 hover:text-primary">{{ item.productName }}</RouterLink>
+                  <p class="text-sm text-slate-500">库存: {{ item.stock }}</p>
+                  <p class="mt-1 font-bold text-primary md:hidden">¥{{ Number(item.price).toFixed(2) }}</p>
+                </div>
+                <div class="hidden w-32 text-center md:block">
+                  <span class="text-sm text-slate-500">单价</span>
+                  <p class="font-medium">¥{{ Number(item.price).toFixed(2) }}</p>
+                </div>
+                <div class="flex items-center gap-1 rounded-full bg-slate-100 p-1">
+                  <button class="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-white" @click="changeQty(item.id, item.quantity - 1)">
+                    <span class="material-symbols-outlined text-sm">remove</span>
+                  </button>
+                  <span class="w-8 text-center font-bold">{{ item.quantity }}</span>
+                  <button class="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-white" @click="changeQty(item.id, item.quantity + 1)">
+                    <span class="material-symbols-outlined text-sm">add</span>
+                  </button>
+                </div>
+                <div class="hidden w-24 text-right md:block">
+                  <p class="text-lg font-bold text-orange-500">¥{{ Number(item.subtotal).toFixed(2) }}</p>
+                </div>
+                <button class="text-slate-400 transition-colors hover:text-red-500" @click="remove(item.id)">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+              </article>
             </div>
-            <button class="btn btn-danger !px-3 !py-1.5" :disabled="actioningId === item.id" @click="remove(item.id)">删除</button>
-          </article>
-          <p v-if="cart.items.length === 0" class="empty-block">购物车为空</p>
+            <p v-if="cart.items.length === 0" class="p-8 text-center text-sm text-slate-500">购物车为空</p>
+          </div>
+
+          <div class="mt-12" v-if="suggestProducts.length">
+            <h2 class="mb-6 flex items-center gap-2 text-xl font-bold">
+              <span class="material-symbols-outlined text-primary">recommend</span>
+              猜你喜欢
+            </h2>
+            <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+              <article v-for="item in suggestProducts" :key="item.id" class="group cursor-pointer rounded-xl border border-primary/5 bg-white p-3 shadow-sm">
+                <RouterLink :to="`/product/${item.id}`" class="mb-3 block aspect-square overflow-hidden rounded-lg bg-slate-100">
+                  <img :src="item.mainImage || fallbackImage" :alt="item.name" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                </RouterLink>
+                <h4 class="mb-1 truncate text-sm font-bold">{{ item.name }}</h4>
+                <p class="font-bold text-orange-500">¥{{ Number(item.price).toFixed(2) }}</p>
+                <button class="mt-3 w-full rounded-full bg-primary/10 py-1.5 text-xs font-bold text-primary transition-colors hover:bg-primary hover:text-white" @click="addSuggest(item.id)">
+                  加入购物车
+                </button>
+              </article>
+            </div>
+          </div>
         </section>
 
-        <aside class="surface-card h-fit p-5">
-          <h2 class="text-lg font-black">订单结算</h2>
-          <p class="mt-2 text-sm text-slate-600">已选 {{ selectedIds.length }} 件商品</p>
-          <p class="mt-1 text-3xl font-black text-primary">¥{{ selectedTotal.toFixed(2) }}</p>
-          <button class="btn btn-primary mt-4 w-full !py-3" :disabled="loading" @click="checkout">
-            {{ loading ? '提交中...' : '提交订单' }}
-          </button>
-          <p class="mt-3 text-xs text-slate-500">提示：若后端未启动，会自动使用前端 Mock 流程进行演示。</p>
+        <aside class="w-full flex-shrink-0 lg:w-80">
+          <div class="sticky top-24 rounded-xl border border-primary/10 bg-white p-6 shadow-lg">
+            <h2 class="mb-6 text-xl font-bold">订单摘要</h2>
+            <div class="mb-6 space-y-4">
+              <div class="flex justify-between text-slate-500">
+                <span>商品小计</span>
+                <span>¥{{ selectedTotal.toFixed(2) }}</span>
+              </div>
+              <div class="flex justify-between text-slate-500">
+                <span>运费</span>
+                <span class="text-primary">免运费</span>
+              </div>
+              <div class="flex justify-between text-slate-500">
+                <span>优惠券减免</span>
+                <span>- ¥0.00</span>
+              </div>
+              <div class="flex items-end justify-between border-t border-primary/10 pt-4">
+                <span class="text-lg font-bold">总计</span>
+                <div class="text-right">
+                  <p class="text-3xl font-bold text-orange-500">¥{{ selectedTotal.toFixed(2) }}</p>
+                  <p class="text-xs text-slate-400">含税费约 ¥0.00</p>
+                </div>
+              </div>
+            </div>
+            <button
+              class="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-4 font-bold text-white shadow-lg shadow-primary/30 transition-transform active:scale-95"
+              :disabled="loading"
+              @click="checkout"
+            >
+              <span>{{ loading ? '提交中...' : `去结算 (${selectedIds.length}件)` }}</span>
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </div>
         </aside>
       </div>
     </main>
@@ -50,58 +124,65 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router';
 import AppHeader from '@/components/AppHeader.vue';
-import { addressApi, cartApi, orderApi } from '@/api';
+import { addressApi, cartApi, orderApi, productApi } from '@/api';
 import { useCartStore } from '@/stores/cart';
+import type { ProductItem } from '@/types/api';
 
 const router = useRouter();
 const cart = useCartStore();
 const selectedIds = ref<number[]>([]);
 const loading = ref(false);
-const actioningId = ref(0);
+const suggestProducts = ref<ProductItem[]>([]);
+const fallbackImage = 'https://images.unsplash.com/photo-1608797178974-15b35a64ede9?auto=format&fit=crop&w=1200&q=80';
 
 const selectedTotal = computed(() =>
-  cart.items
-    .filter((item) => selectedIds.value.includes(item.id))
-    .reduce((sum, item) => sum + Number(item.subtotal), 0),
+  cart.items.filter((item) => selectedIds.value.includes(item.id)).reduce((sum, item) => sum + Number(item.subtotal), 0),
 );
+
+const allSelected = computed({
+  get: () => cart.items.length > 0 && selectedIds.value.length === cart.items.length,
+  set: (checked: boolean) => {
+    selectedIds.value = checked ? cart.items.map((item) => item.id) : [];
+  },
+});
 
 async function reload() {
   await cart.reload();
   selectedIds.value = cart.items.map((item) => item.id);
 }
 
+function toggleAll() {
+  allSelected.value = !allSelected.value;
+}
+
 async function changeQty(itemId: number, qty: number) {
   if (qty < 1) return;
-  actioningId.value = itemId;
   try {
     await cartApi.update(itemId, { quantity: qty });
     await reload();
   } catch (error) {
     alert((error as Error).message);
-  } finally {
-    actioningId.value = 0;
   }
 }
 
 async function remove(itemId: number) {
-  actioningId.value = itemId;
   try {
     await cartApi.remove(itemId);
     await reload();
   } catch (error) {
     alert((error as Error).message);
-  } finally {
-    actioningId.value = 0;
   }
 }
 
-function toggleAll() {
-  if (selectedIds.value.length === cart.items.length) {
-    selectedIds.value = [];
-  } else {
-    selectedIds.value = cart.items.map((item) => item.id);
+async function addSuggest(productId: number) {
+  try {
+    await cartApi.add({ productId, quantity: 1 });
+    await reload();
+    alert('已加入购物车');
+  } catch (error) {
+    alert((error as Error).message);
   }
 }
 
@@ -120,8 +201,8 @@ async function checkout() {
       return;
     }
     await orderApi.create({ addressId: address.id, cartItemIds: selectedIds.value });
-    alert('下单成功');
     await reload();
+    alert('下单成功');
     router.push('/orders');
   } catch (error) {
     alert((error as Error).message);
@@ -130,7 +211,12 @@ async function checkout() {
   }
 }
 
-onMounted(() => {
-  reload().catch((error) => alert((error as Error).message));
+onMounted(async () => {
+  try {
+    await reload();
+    suggestProducts.value = await productApi.list({ page: 1, size: 4, sort: 'latest' }).then((res) => res.list);
+  } catch (error) {
+    alert((error as Error).message);
+  }
 });
 </script>

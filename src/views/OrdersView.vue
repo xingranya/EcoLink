@@ -1,53 +1,87 @@
 <template>
-  <div class="page-shell">
+  <div class="min-h-screen bg-background-light font-display text-slate-900">
     <AppHeader />
-    <main class="page-main">
-      <div class="section-head">
-        <div>
-          <h1 class="section-title">我的订单</h1>
-          <p class="section-subtitle">支持模拟支付和状态展示</p>
+    <main class="mx-auto w-full max-w-[1200px] flex-1 px-4 py-8 md:px-10">
+      <div class="mb-8 overflow-x-auto">
+        <div class="min-w-max border-b border-primary/10">
+          <div class="flex">
+            <button
+              v-for="tab in tabs"
+              :key="tab.key"
+              class="flex flex-col items-center justify-center border-b-2 px-6 pb-4 pt-2 text-sm font-bold transition-all"
+              :class="activeTab === tab.key ? 'border-primary text-primary' : 'border-transparent text-primary/60 hover:text-primary'"
+              @click="activeTab = tab.key"
+            >
+              {{ tab.label }}
+            </button>
+          </div>
         </div>
       </div>
-      <div class="mt-6 space-y-4">
-        <article v-for="order in orders" :key="order.id" class="surface-card p-5">
-          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
-            <p class="text-sm text-slate-500">订单号：{{ order.orderNo }}</p>
-            <p class="status-pill bg-primary/10 text-primary">{{ statusText(order.status) }}</p>
-          </div>
-          <div class="space-y-3 pt-3">
-            <div v-for="item in order.items" :key="item.id" class="flex items-center gap-3">
-              <img :src="item.productImage" class="h-14 w-14 rounded-xl object-cover" />
-              <div class="flex-1">
-                <p class="font-medium">{{ item.productName }}</p>
-                <p class="text-xs text-slate-500">x{{ item.quantity }}</p>
+
+      <div v-if="loading" class="rounded-xl bg-white p-8 text-center text-sm text-slate-500">订单加载中...</div>
+      <div v-else class="flex flex-col gap-6">
+        <article
+          v-for="order in filteredOrders"
+          :key="order.id"
+          class="overflow-hidden rounded-xl border border-primary/10 bg-white shadow-sm"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-primary/5 p-4 md:p-6">
+            <div class="flex flex-col">
+              <div class="flex items-center gap-2">
+                <span class="text-lg font-bold">#{{ order.orderNo }}</span>
+                <span class="rounded px-2 py-0.5 text-xs font-bold uppercase" :class="statusClass(order.status)">{{ statusText(order.status) }}</span>
               </div>
-              <p class="font-bold">¥{{ Number(item.subtotal).toFixed(2) }}</p>
+              <p class="text-sm text-slate-500">下单日期: {{ formatTime(order.createdAt) }}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm text-slate-500">收货人: {{ order.receiverName }}</p>
+              <p class="text-base font-semibold text-primary">总价 ¥{{ Number(order.totalAmount).toFixed(2) }}</p>
             </div>
           </div>
-          <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-4">
-            <p class="text-sm text-slate-500">创建时间：{{ formatTime(order.createdAt) }}</p>
-            <div class="flex items-center gap-3">
-              <p class="text-lg font-black text-primary">¥{{ Number(order.totalAmount).toFixed(2) }}</p>
+
+          <div class="space-y-4 p-4 md:p-6">
+            <div v-for="item in order.items" :key="item.id" class="flex items-center gap-4">
+              <img :src="item.productImage || fallbackImage" class="h-20 w-20 flex-shrink-0 rounded-lg object-cover" />
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-base font-medium">{{ item.productName }}</p>
+                <p class="text-sm text-slate-500">数量 x{{ item.quantity }}</p>
+                <p class="mt-1 text-sm font-bold">小计 ¥{{ Number(item.subtotal).toFixed(2) }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-4 bg-primary/5 p-4 md:p-6">
+            <div class="flex items-baseline gap-2">
+              <span class="text-sm text-slate-600">总计:</span>
+              <span class="text-xl font-bold text-primary">¥{{ Number(order.totalAmount).toFixed(2) }}</span>
+            </div>
+            <div class="flex gap-3">
+              <button class="rounded-lg border border-primary/20 bg-white px-4 py-2 text-sm font-bold text-slate-900 transition-colors hover:bg-slate-50">
+                查看详情
+              </button>
               <button
                 v-if="order.status === 'UNPAID'"
-                class="btn btn-primary !px-4 !py-2"
+                class="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-primary/90"
                 :disabled="payingOrderId === order.id"
                 @click="pay(order.id)"
               >
                 {{ payingOrderId === order.id ? '支付中...' : '模拟支付' }}
               </button>
+              <button v-else class="rounded-lg border border-primary/20 bg-primary/20 px-4 py-2 text-sm font-bold text-primary transition-colors hover:bg-primary/30">
+                查看物流
+              </button>
             </div>
           </div>
         </article>
-        <p v-if="!orders.length && !loading" class="empty-block">暂无订单，去购物车提交一单试试。</p>
-        <p v-if="loading" class="empty-block">订单加载中...</p>
+
+        <p v-if="!filteredOrders.length" class="rounded-xl bg-white p-8 text-center text-sm text-slate-500">当前筛选暂无订单</p>
       </div>
     </main>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import AppHeader from '@/components/AppHeader.vue';
 import { orderApi } from '@/api';
 import type { OrderData, OrderStatus } from '@/types/api';
@@ -55,6 +89,20 @@ import type { OrderData, OrderStatus } from '@/types/api';
 const orders = ref<OrderData[]>([]);
 const loading = ref(false);
 const payingOrderId = ref(0);
+const activeTab = ref<'all' | 'UNPAID' | 'PAID' | 'SHIPPED' | 'COMPLETED'>('all');
+const fallbackImage = 'https://images.unsplash.com/photo-1608797178974-15b35a64ede9?auto=format&fit=crop&w=1200&q=80';
+
+const tabs = [
+  { key: 'all', label: '全部订单' },
+  { key: 'UNPAID', label: '待付款' },
+  { key: 'PAID', label: '待发货' },
+  { key: 'SHIPPED', label: '待收货' },
+  { key: 'COMPLETED', label: '已完成' },
+] as const;
+
+const filteredOrders = computed(() =>
+  activeTab.value === 'all' ? orders.value : orders.value.filter((item) => item.status === activeTab.value),
+);
 
 function formatTime(time: string) {
   return new Date(time).toLocaleString();
@@ -62,12 +110,20 @@ function formatTime(time: string) {
 
 function statusText(status: OrderStatus) {
   return {
-    UNPAID: '待支付',
+    UNPAID: '待付款',
     PAID: '待发货',
-    SHIPPED: '已发货',
+    SHIPPED: '待收货',
     COMPLETED: '已完成',
     CANCELLED: '已取消',
   }[status];
+}
+
+function statusClass(status: OrderStatus) {
+  if (status === 'UNPAID') return 'bg-amber-100 text-amber-700';
+  if (status === 'PAID') return 'bg-blue-100 text-blue-700';
+  if (status === 'SHIPPED') return 'bg-primary/15 text-primary';
+  if (status === 'COMPLETED') return 'bg-emerald-100 text-emerald-700';
+  return 'bg-slate-200 text-slate-700';
 }
 
 async function loadOrders() {

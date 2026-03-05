@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.User;
 public final class SecurityUtils {
     private SecurityUtils() {}
 
+    @SuppressWarnings("null")
     public static Long currentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof User user)) {

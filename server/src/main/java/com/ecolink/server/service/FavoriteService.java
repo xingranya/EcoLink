@@ -25,6 +25,7 @@ public class FavoriteService {
         this.authService = authService;
     }
 
+    @Transactional(readOnly = true)
     public List<FavoriteItemResponse> list() {
         Long userId = SecurityUtils.currentUserId();
         return favoriteRepository.findByUserIdOrderByCreatedAtDesc(userId).stream().map(this::toResponse).toList();

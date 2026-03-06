@@ -1,6 +1,5 @@
 <template>
-  <div class="min-h-screen bg-background-light">
-    <AppHeader />
+  <div class="flex-1 bg-background-light">
     <main class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-10">
       <nav class="mb-6 flex flex-wrap items-center gap-2 text-sm font-medium">
         <RouterLink class="text-primary hover:underline" to="/">首页</RouterLink>
@@ -10,10 +9,13 @@
         <span class="text-slate-500">{{ product?.name || '商品详情' }}</span>
       </nav>
 
-      <div v-if="loading" class="rounded-xl bg-white p-10 text-center text-sm text-slate-500">加载中...</div>
+      <div v-if="loading" class="flex flex-col items-center gap-3 rounded-2xl bg-white p-16">
+        <span class="material-symbols-outlined animate-spin text-3xl text-primary">progress_activity</span>
+        <span class="text-sm text-slate-500">加载中...</span>
+      </div>
       <div v-else-if="product" class="grid grid-cols-1 gap-10 lg:grid-cols-2">
         <div class="flex flex-col gap-4">
-          <div class="aspect-square w-full overflow-hidden rounded-xl bg-slate-200 shadow-sm">
+          <div class="aspect-square w-full overflow-hidden rounded-xl bg-slate-200 shadow-sm transition-all hover:shadow-md">
             <img :src="activeImage || product.mainImage || fallbackImage" :alt="product.name" class="h-full w-full object-cover" />
           </div>
           <div class="grid grid-cols-4 gap-4">
@@ -66,10 +68,11 @@
               {{ cartLoading ? '加入中...' : '加入购物车' }}
             </button>
             <button
-              class="flex h-14 flex-1 items-center justify-center rounded-xl border-2 border-primary bg-transparent text-lg font-bold text-primary transition-all hover:bg-primary/5 active:scale-[0.98]"
+              class="flex h-14 flex-1 items-center justify-center gap-2 rounded-xl border-2 border-primary bg-transparent text-lg font-bold text-primary transition-all hover:bg-primary/5 active:scale-[0.98]"
               :disabled="favoriteLoading"
               @click="favorite"
             >
+              <span class="material-symbols-outlined">favorite</span>
               {{ favoriteLoading ? '收藏中...' : '收藏商品' }}
             </button>
           </div>
@@ -83,33 +86,118 @@
               <span class="material-symbols-outlined text-primary">assignment_return</span>
               <span class="text-sm font-medium">新鲜品质保证</span>
             </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">verified_user</span>
+              <span class="text-sm font-medium">正品保障</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <section v-if="product" class="mt-16">
+      <section v-if="product" class="mt-12">
         <div class="border-b border-primary/10">
           <nav class="flex gap-8">
-            <button class="border-b-4 border-primary pb-4 text-lg font-bold text-primary">详情介绍</button>
-            <button class="border-b-4 border-transparent pb-4 text-lg font-medium text-slate-500">规格参数</button>
-            <button class="border-b-4 border-transparent pb-4 text-lg font-medium text-slate-500">溯源信息</button>
+            <a href="#section-detail" class="border-b-4 border-primary pb-4 text-lg font-bold text-primary">详情介绍</a>
+            <a href="#section-specs" class="border-b-4 border-transparent pb-4 text-lg font-medium text-slate-500 hover:text-primary">规格参数</a>
+            <a href="#section-trace" class="border-b-4 border-transparent pb-4 text-lg font-medium text-slate-500 hover:text-primary">溯源信息</a>
           </nav>
         </div>
-        <div class="py-10">
+
+        <div id="section-detail" class="py-10">
           <div class="grid grid-cols-1 items-center gap-10 md:grid-cols-2">
             <div>
-              <h3 class="mb-4 text-2xl font-bold">青提中的“爱马仕”</h3>
-              <p class="mb-4 leading-relaxed text-slate-600">{{ product.detail || '精选优质生态农产品，严格品控，安全健康。' }}</p>
-              <ul class="space-y-2 text-slate-600">
-                <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-primary">check_circle</span> 精选优质产区</li>
-                <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-primary">check_circle</span> 新鲜冷链直发</li>
-                <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-primary">check_circle</span> 产地可溯源</li>
+              <h3 class="mb-4 text-2xl font-black">生态精选 · 品质之选</h3>
+              <p class="mb-6 leading-relaxed text-slate-600">{{ product.detail || '精选优质生态农产品，严格品控，从源头把关，只为给您最安全、最健康的食材。每一件商品都经过层层筛选，确保新鲜直达。' }}</p>
+              <ul class="space-y-3 text-slate-600">
+                <li class="flex items-center gap-3"><span class="material-symbols-outlined text-lg text-primary">check_circle</span> 精选优质产区，源头直采</li>
+                <li class="flex items-center gap-3"><span class="material-symbols-outlined text-lg text-primary">check_circle</span> 顺丰冷链直发，锁住新鲜</li>
+                <li class="flex items-center gap-3"><span class="material-symbols-outlined text-lg text-primary">check_circle</span> 全程可追溯，安全透明</li>
+                <li class="flex items-center gap-3"><span class="material-symbols-outlined text-lg text-primary">check_circle</span> 零农药残留，绿色有机</li>
               </ul>
             </div>
             <div class="overflow-hidden rounded-2xl shadow-xl">
-              <img :src="product.images[1] || product.mainImage || fallbackImage" class="h-64 w-full object-cover" />
+              <img :src="product.images?.[1] || product.mainImage || fallbackImage" :alt="product.name" class="h-64 w-full object-cover" loading="lazy" />
             </div>
           </div>
+        </div>
+
+        <div id="section-specs" class="rounded-2xl border border-primary/5 bg-white p-8">
+          <h3 class="mb-6 flex items-center gap-2 text-xl font-black">
+            <span class="material-symbols-outlined text-primary">list_alt</span>
+            技术规格
+          </h3>
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="rounded-xl border border-primary/10 bg-background-light p-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">产地</span>
+              <p class="mt-1 font-bold">{{ product.categoryName || '优质产区' }}</p>
+            </div>
+            <div class="rounded-xl border border-primary/10 bg-background-light p-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">保质期</span>
+              <p class="mt-1 font-bold">7-10天（冷藏保存）</p>
+            </div>
+            <div class="rounded-xl border border-primary/10 bg-background-light p-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">储存方式</span>
+              <p class="mt-1 font-bold">冷藏 2-5°C</p>
+            </div>
+            <div class="rounded-xl border border-primary/10 bg-background-light p-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">规格</span>
+              <p class="mt-1 font-bold">500g ± 20g / 份</p>
+            </div>
+            <div class="rounded-xl border border-primary/10 bg-background-light p-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">库存</span>
+              <p class="mt-1 font-bold">{{ product.stock }} 件</p>
+            </div>
+            <div class="rounded-xl border border-primary/10 bg-background-light p-4">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-400">认证</span>
+              <p class="mt-1 font-bold">绿色有机认证</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="section-trace" class="mt-10 flex flex-col items-center gap-10 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-8 md:flex-row">
+          <div class="flex-1">
+            <h3 class="mb-2 text-xl font-black">溯源信息 (Traceability Information)</h3>
+            <p class="mb-6 text-slate-600">扫描二维码查看产品完整溯源信息，从果园地块到质检中心的全程记录，让每一口都安心。</p>
+            <div class="flex flex-wrap gap-4">
+              <div class="flex flex-col items-center gap-2 rounded-xl bg-white p-4 shadow-sm">
+                <span class="material-symbols-outlined text-4xl text-primary">qr_code_2</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider">扫码溯源</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 rounded-xl bg-white p-4 shadow-sm">
+                <span class="material-symbols-outlined text-4xl text-primary">workspace_premium</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider">资质证明</span>
+              </div>
+              <div class="flex flex-col items-center gap-2 rounded-xl bg-white p-4 shadow-sm">
+                <span class="material-symbols-outlined text-4xl text-primary">verified_user</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider">质检报告</span>
+              </div>
+            </div>
+          </div>
+          <div class="flex h-36 w-full items-center justify-center rounded-xl bg-white p-6 shadow-inner md:w-64">
+            <div class="text-center">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-400">批次编号</p>
+              <p class="mt-1 text-lg font-black tracking-widest text-primary">EC-{{ new Date().getFullYear() }}-{{ String(product.id).padStart(3, '0') }}</p>
+              <p class="mt-2 text-xs italic text-slate-500">采摘日期：{{ new Date(Date.now() - 3 * 86400000).toLocaleDateString('zh-CN') }}</p>
+              <p class="text-xs italic text-slate-500">产地：{{ product.categoryName || '精选产区' }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section v-if="relatedProducts.length" class="mt-20 pb-10">
+        <h2 class="mb-8 text-2xl font-black tracking-tight">你可能还喜欢</h2>
+        <div class="grid grid-cols-2 gap-6 md:grid-cols-4">
+          <RouterLink v-for="item in relatedProducts" :key="item.id" :to="`/product/${item.id}`" class="group cursor-pointer">
+            <div class="relative mb-3 aspect-square overflow-hidden rounded-xl bg-slate-100">
+              <img :src="item.mainImage || fallbackImage" :alt="item.name" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />
+              <button class="absolute right-2 top-2 rounded-full bg-white/90 p-1.5 text-primary shadow-sm transition-colors hover:bg-primary hover:text-white" @click.prevent="favoriteRelated(item.id)">
+                <span class="material-symbols-outlined text-sm">favorite</span>
+              </button>
+            </div>
+            <h4 class="line-clamp-1 font-bold text-slate-800">{{ item.name }}</h4>
+            <p class="text-sm text-slate-500">{{ item.subtitle || '生态优选' }}</p>
+            <p class="mt-1 font-black text-primary">¥{{ Number(item.price).toFixed(2) }}</p>
+          </RouterLink>
         </div>
       </section>
     </main>
@@ -119,10 +207,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
-import AppHeader from '@/components/AppHeader.vue';
 import { cartApi, favoriteApi, productApi } from '@/api';
 import { useCartStore } from '@/stores/cart';
-import type { ProductDetail } from '@/types/api';
+import type { ProductDetail, ProductItem } from '@/types/api';
 
 const route = useRoute();
 const product = ref<ProductDetail | null>(null);
@@ -131,6 +218,7 @@ const quantity = ref(1);
 const loading = ref(false);
 const cartLoading = ref(false);
 const favoriteLoading = ref(false);
+const relatedProducts = ref<ProductItem[]>([]);
 const cart = useCartStore();
 const fallbackImage = 'https://images.unsplash.com/photo-1608797178974-15b35a64ede9?auto=format&fit=crop&w=1200&q=80';
 
@@ -139,6 +227,8 @@ async function loadDetail() {
   try {
     product.value = await productApi.detail(Number(route.params.id));
     activeImage.value = product.value.images[0] || product.value.mainImage || '';
+    const res = await productApi.list({ page: 1, size: 4, sort: 'latest' });
+    relatedProducts.value = res.list.filter((item) => item.id !== product.value?.id).slice(0, 4);
   } finally {
     loading.value = false;
   }
@@ -168,6 +258,15 @@ async function favorite() {
     alert((error as Error).message);
   } finally {
     favoriteLoading.value = false;
+  }
+}
+
+async function favoriteRelated(productId: number) {
+  try {
+    await favoriteApi.add(productId);
+    alert('收藏成功');
+  } catch (error) {
+    alert((error as Error).message);
   }
 }
 

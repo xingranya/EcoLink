@@ -1,6 +1,5 @@
 <template>
-  <div class="min-h-screen bg-background-light font-display text-slate-900">
-    <AppHeader />
+  <div class="flex-1 bg-background-light font-display text-slate-900">
     <main class="mx-auto w-full max-w-[1200px] flex-1 px-4 py-8 md:px-10">
       <div class="mb-8 overflow-x-auto">
         <div class="min-w-max border-b border-primary/10">
@@ -23,7 +22,9 @@
         <article
           v-for="order in filteredOrders"
           :key="order.id"
-          class="overflow-hidden rounded-xl border border-primary/10 bg-white shadow-sm"
+          :id="`order-${order.id}`"
+          class="overflow-hidden rounded-xl border bg-white shadow-sm transition-all"
+          :class="expandedOrderId === order.id ? 'border-primary/30 ring-2 ring-primary/10' : 'border-primary/10'"
         >
           <div class="flex flex-wrap items-center justify-between gap-4 border-b border-primary/5 p-4 md:p-6">
             <div class="flex flex-col">
@@ -41,7 +42,7 @@
 
           <div class="space-y-4 p-4 md:p-6">
             <div v-for="item in order.items" :key="item.id" class="flex items-center gap-4">
-              <img :src="item.productImage || fallbackImage" class="h-20 w-20 flex-shrink-0 rounded-lg object-cover" />
+              <img :src="item.productImage || fallbackImage" :alt="item.productName" class="h-20 w-20 flex-shrink-0 rounded-lg object-cover" loading="lazy" />
               <div class="min-w-0 flex-1">
                 <p class="truncate text-base font-medium">{{ item.productName }}</p>
                 <p class="text-sm text-slate-500">数量 x{{ item.quantity }}</p>
@@ -50,22 +51,44 @@
             </div>
           </div>
 
+          <div v-if="expandedOrderId === order.id" class="border-t border-primary/5 bg-slate-50 px-4 py-4 md:px-6">
+            <dl class="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+              <div class="flex gap-2">
+                <dt class="text-slate-500">收货人:</dt>
+                <dd class="font-medium">{{ order.receiverName }} {{ order.receiverPhone }}</dd>
+              </div>
+              <div class="flex gap-2">
+                <dt class="text-slate-500">收货地址:</dt>
+                <dd class="font-medium">{{ order.receiverAddress }}</dd>
+              </div>
+              <div class="flex gap-2">
+                <dt class="text-slate-500">下单时间:</dt>
+                <dd class="font-medium">{{ formatTime(order.createdAt) }}</dd>
+              </div>
+              <div v-if="order.paidAt" class="flex gap-2">
+                <dt class="text-slate-500">支付时间:</dt>
+                <dd class="font-medium">{{ formatTime(order.paidAt) }}</dd>
+              </div>
+            </dl>
+          </div>
           <div class="flex flex-wrap items-center justify-between gap-4 bg-primary/5 p-4 md:p-6">
             <div class="flex items-baseline gap-2">
               <span class="text-sm text-slate-600">总计:</span>
               <span class="text-xl font-bold text-primary">¥{{ Number(order.totalAmount).toFixed(2) }}</span>
             </div>
             <div class="flex gap-3">
-              <button class="rounded-lg border border-primary/20 bg-white px-4 py-2 text-sm font-bold text-slate-900 transition-colors hover:bg-slate-50">
-                查看详情
+              <button
+                class="rounded-lg border border-primary/20 bg-white px-4 py-2 text-sm font-bold text-slate-900 transition-colors hover:bg-slate-50"
+                @click="toggleDetail(order.id)"
+              >
+                {{ expandedOrderId === order.id ? '收起详情' : '查看详情' }}
               </button>
               <button
                 v-if="order.status === 'UNPAID'"
                 class="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-primary/90"
-                :disabled="payingOrderId === order.id"
-                @click="pay(order.id)"
+                @click="goPayment(order.id)"
               >
-                {{ payingOrderId === order.id ? '支付中...' : '模拟支付' }}
+                立即支付
               </button>
               <button v-else class="rounded-lg border border-primary/20 bg-primary/20 px-4 py-2 text-sm font-bold text-primary transition-colors hover:bg-primary/30">
                 查看物流
@@ -82,13 +105,15 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import AppHeader from '@/components/AppHeader.vue';
+import { useRoute, useRouter } from 'vue-router';
 import { orderApi } from '@/api';
 import type { OrderData, OrderStatus } from '@/types/api';
 
+const route = useRoute();
+const router = useRouter();
 const orders = ref<OrderData[]>([]);
 const loading = ref(false);
-const payingOrderId = ref(0);
+const expandedOrderId = ref(0);
 const activeTab = ref<'all' | 'UNPAID' | 'PAID' | 'SHIPPED' | 'COMPLETED'>('all');
 const fallbackImage = 'https://images.unsplash.com/photo-1608797178974-15b35a64ede9?auto=format&fit=crop&w=1200&q=80';
 
@@ -135,19 +160,20 @@ async function loadOrders() {
   }
 }
 
-async function pay(id: number) {
-  payingOrderId.value = id;
-  try {
-    await orderApi.pay(id);
-    await loadOrders();
-  } catch (error) {
-    alert((error as Error).message);
-  } finally {
-    payingOrderId.value = 0;
-  }
+function goPayment(orderId: number) {
+  router.push(`/payment/${orderId}`);
+}
+
+function toggleDetail(orderId: number) {
+  expandedOrderId.value = expandedOrderId.value === orderId ? 0 : orderId;
 }
 
 onMounted(() => {
+  const tab = route.query.tab as string | undefined;
+  const validTabs = ['all', 'UNPAID', 'PAID', 'SHIPPED', 'COMPLETED'];
+  if (tab && validTabs.includes(tab)) {
+    activeTab.value = tab as typeof activeTab.value;
+  }
   loadOrders().catch((error) => alert((error as Error).message));
 });
 </script>

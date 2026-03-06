@@ -53,21 +53,23 @@ npm run dev
 CREATE DATABASE ecolink DEFAULT CHARACTER SET utf8mb4;
 ```
 
-2. 设置环境变量（可选）
+2. 配置环境变量
 
-- `DB_URL`（默认 `jdbc:mysql://localhost:3306/ecolink?...`）
-- `DB_USERNAME`（默认 `root`）
-- `DB_PASSWORD`（默认 `root`）
-- `JWT_SECRET`（建议修改）
+```bash
+cd server
+cp .env.example .env
+# 编辑 .env：把 DB_PASSWORD 改成你本机 MySQL root 的密码
+# 若 8080 端口被占用，可设置 SERVER_PORT=8081
+```
 
-3. 启动后端
+3. 启动后端（**必须在 server 目录下执行**，否则读不到 .env）
 
 ```bash
 cd server
 mvn spring-boot:run
 ```
 
-Flyway 会自动执行 `V1/V2` 脚本初始化表结构与种子数据。
+Flyway 会自动执行 `V1/V2` 脚本初始化表结构与种子数据。若出现 `Access denied for user 'root'@'localhost'`，请确认：① 是在 `server` 目录下执行的上述命令；② `.env` 中的 `DB_PASSWORD` 与本地 MySQL root 密码一致（可先用 `mysql -u root -p` 验证）。
 
 ## 默认演示账号
 

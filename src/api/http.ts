@@ -15,26 +15,53 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
-async function request<T>(method: 'get' | 'post' | 'put' | 'delete', url: string, data?: unknown, params?: unknown): Promise<T> {
-  try {
-    const response = await client.request<ApiResponse<T>>({ method, url, data, params });
-    const body = response.data;
-    if (body.code !== 0) {
-      throw new Error(body.message || '请求失败');
+client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      handleAuthExpired();
     }
-    return body.data;
-  } catch (error: unknown) {
-    const axiosError = error as { response?: { data?: { message?: string } }; message?: string };
-    const hasResponse = Boolean(axiosError?.response);
-    const useMock = import.meta.env.VITE_ENABLE_MOCK !== 'false';
+    return Promise.reject(error);
+  },
+);
 
-    if (!hasResponse && useMock) {
+function handleAuthExpired() {
+  localStorage.removeItem('ecolink_token');
+  if (window.location.pathname !== '/login') {
+    window.location.href = '/login';
+  }
+}
+
+function isAxiosNetworkError(error: unknown): boolean {
+  const err = error as { code?: string; response?: unknown };
+  if (err?.code === 'ERR_NETWORK' || err?.code === 'ECONNABORTED') return true;
+  if (!err?.response && err?.code === 'ECONNREFUSED') return true;
+  return false;
+}
+
+async function request<T>(method: 'get' | 'post' | 'put' | 'delete', url: string, data?: unknown, params?: unknown): Promise<T> {
+  const useMock = import.meta.env.VITE_ENABLE_MOCK !== 'false';
+
+  let response;
+  try {
+    response = await client.request<ApiResponse<T>>({ method, url, data, params });
+  } catch (networkError: unknown) {
+    if (isAxiosNetworkError(networkError) && useMock) {
       return mockRequest<T>(method, url, data, params);
     }
-
-    const message = axiosError?.response?.data?.message || axiosError?.message || '请求失败';
+    const axiosErr = networkError as { response?: { data?: { message?: string }; status?: number }; message?: string };
+    const message = axiosErr?.response?.data?.message || axiosErr?.message || '请求失败';
     throw new Error(message);
   }
+
+  const body = response.data;
+  if (body.code !== 0) {
+    if (body.code === 4010) {
+      handleAuthExpired();
+    }
+    throw new Error(body.message || '请求失败');
+  }
+  return body.data;
 }
 
 const http = {

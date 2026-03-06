@@ -7,3 +7,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Windows reserved device name (invalid path for git on Windows)
+nul

@@ -1,19 +1,22 @@
 <template>
-  <header class="sticky top-0 z-50 w-full border-b border-primary/10 bg-white/80 backdrop-blur-md">
+  <header class="sticky top-0 z-50 w-full border-b border-primary/5 bg-white/90 backdrop-blur-xl">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
       <div class="flex items-center gap-3">
-        <div class="flex size-10 items-center justify-center rounded-lg bg-primary text-white">
+        <div class="flex size-10 items-center justify-center rounded-xl bg-primary text-white shadow-md shadow-primary/20">
           <span class="material-symbols-outlined text-2xl">eco</span>
         </div>
-        <RouterLink to="/" class="text-base font-bold tracking-tight text-primary sm:text-xl">绿色生态农产品销售系统</RouterLink>
+        <RouterLink to="/" class="font-bold tracking-tight text-primary">
+          <span class="text-base sm:hidden">EcoLink</span>
+          <span class="hidden text-xl sm:inline">EcoLink · 绿色生态</span>
+        </RouterLink>
       </div>
 
-      <nav class="hidden items-center gap-8 md:flex">
+      <nav class="hidden items-center gap-1 md:flex">
         <RouterLink
           v-for="item in navItems"
           :key="item.to"
           :to="item.to"
-          class="rounded px-1 py-0.5 text-sm font-medium transition-colors hover:text-primary"
+          class="rounded-lg px-3 py-1.5 text-sm font-semibold transition-all"
           :class="linkClass(item.to)"
         >
           {{ item.label }}
@@ -21,16 +24,11 @@
       </nav>
 
       <div class="flex items-center gap-2 sm:gap-3">
-        <div class="hidden items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-primary sm:flex">
-          <span class="material-symbols-outlined text-sm">wb_sunny</span>
-          <span class="text-xs font-semibold">24°C 晴空</span>
-        </div>
-
-        <RouterLink to="/cart" class="relative rounded-full p-2 transition-colors hover:bg-primary/10">
+        <RouterLink to="/cart" class="relative rounded-xl p-2 transition-colors hover:bg-primary/10" aria-label="购物车">
           <span class="material-symbols-outlined">shopping_cart</span>
           <span
             v-if="cart.totalCount"
-            class="absolute right-1 top-1 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] text-white"
+            class="absolute -right-0.5 -top-0.5 flex size-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-bold text-white shadow-sm"
           >
             {{ cart.totalCount > 99 ? '99+' : cart.totalCount }}
           </span>
@@ -38,12 +36,13 @@
 
         <RouterLink
           :to="auth.isLogin ? '/profile' : '/login'"
-          class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border-2 border-primary/20 bg-primary/10 text-primary"
+          class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl border-2 border-primary/20 bg-primary/10 text-primary transition-all hover:border-primary/40 hover:bg-primary/20"
+          :aria-label="auth.isLogin ? '个人中心' : '去登录'"
         >
-          <span class="material-symbols-outlined text-base">{{ auth.isLogin ? 'person' : 'login' }}</span>
+          <span class="material-symbols-outlined text-lg">{{ auth.isLogin ? 'person' : 'login' }}</span>
         </RouterLink>
 
-        <button v-if="auth.isLogin" class="hidden rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary sm:block" @click="logout">
+        <button v-if="auth.isLogin" class="hidden rounded-xl bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20 sm:block" @click="logout">
           退出
         </button>
 

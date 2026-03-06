@@ -82,12 +82,14 @@ public class OrderService {
         return toResponse(order, orderItemRepository.findByOrderIdOrderByIdAsc(order.getId()));
     }
 
+    @Transactional(readOnly = true)
     public List<OrderResponse> list() {
         Long userId = SecurityUtils.currentUserId();
         List<Order> orders = orderRepository.findByUserIdOrderByCreatedAtDesc(userId);
         return orders.stream().map(order -> toResponse(order, orderItemRepository.findByOrderIdOrderByIdAsc(order.getId()))).toList();
     }
 
+    @Transactional(readOnly = true)
     public OrderResponse detail(Long id) {
         Long userId = SecurityUtils.currentUserId();
         Order order = orderRepository.findByIdAndUserId(id, userId).orElseThrow(() -> new BizException(4044, "订单不存在"));
@@ -111,10 +113,10 @@ public class OrderService {
     }
 
     @Transactional
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelay = 5000)
     public void autoFlow() {
         LocalDateTime now = LocalDateTime.now();
-        List<Order> paidOrders = orderRepository.findByStatusAndPaidAtBefore(OrderStatus.PAID, now.minusMinutes(1));
+        List<Order> paidOrders = orderRepository.findByStatusAndPaidAtBefore(OrderStatus.PAID, now.minusSeconds(5));
         for (Order order : paidOrders) {
             OrderStatus from = order.getStatus();
             order.setStatus(OrderStatus.SHIPPED);
@@ -123,7 +125,7 @@ public class OrderService {
             writeStatusLog(order, from, OrderStatus.SHIPPED, "系统自动发货");
         }
 
-        List<Order> shippedOrders = orderRepository.findByStatusAndShippedAtBefore(OrderStatus.SHIPPED, now.minusMinutes(2));
+        List<Order> shippedOrders = orderRepository.findByStatusAndShippedAtBefore(OrderStatus.SHIPPED, now.minusSeconds(5));
         for (Order order : shippedOrders) {
             OrderStatus from = order.getStatus();
             order.setStatus(OrderStatus.COMPLETED);

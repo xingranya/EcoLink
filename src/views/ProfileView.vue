@@ -1,154 +1,168 @@
 <template>
-  <div class="mx-auto flex min-h-screen w-full max-w-[1440px] flex-col bg-background-light lg:flex-row">
-    <aside class="flex w-full flex-col gap-8 border-r border-primary/10 bg-white p-6 lg:w-72">
-      <div class="flex items-center gap-3">
-        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white">
-          <span class="material-symbols-outlined">account_circle</span>
-        </div>
-        <h2 class="text-sm font-bold uppercase tracking-tight text-primary">会员中心</h2>
-      </div>
-      <nav class="flex flex-1 flex-col gap-2">
-        <button class="flex items-center gap-3 rounded-lg bg-primary/10 px-4 py-3 font-medium text-primary">
-          <span class="material-symbols-outlined">person</span>
-          <span>个人信息</span>
-        </button>
-        <RouterLink class="flex items-center gap-3 rounded-lg px-4 py-3 text-slate-600 transition-colors hover:bg-primary/5" to="/orders">
-          <span class="material-symbols-outlined">package_2</span>
-          <span>我的订单</span>
-        </RouterLink>
-        <a class="flex items-center gap-3 rounded-lg px-4 py-3 text-slate-600 transition-colors hover:bg-primary/5" href="#address">
-          <span class="material-symbols-outlined">location_on</span>
-          <span>收货地址</span>
-        </a>
-        <a class="flex items-center gap-3 rounded-lg px-4 py-3 text-slate-600 transition-colors hover:bg-primary/5" href="#favorite">
-          <span class="material-symbols-outlined">favorite</span>
-          <span>我的收藏</span>
-        </a>
-      </nav>
-      <div class="border-t border-primary/10 pt-6">
-        <button
-          class="flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 px-4 py-2.5 font-medium text-slate-600 transition-colors hover:bg-slate-50"
-          @click="logout"
-        >
-          <span class="material-symbols-outlined text-[20px]">logout</span>
-          <span>退出登录</span>
-        </button>
-      </div>
-    </aside>
-
-    <main class="flex-1 space-y-8 overflow-y-auto p-4 lg:p-10">
-      <section class="rounded-xl border border-primary/5 bg-white p-6 shadow-sm">
-        <div class="flex flex-col items-center gap-6 @[520px]:flex-row">
+  <div class="flex-1 bg-background-light">
+    <main class="mx-auto w-full max-w-7xl px-4 py-8 lg:px-8">
+      <section class="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-r from-primary to-emerald-600 p-8 text-white shadow-lg shadow-primary/20">
+        <div class="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10"></div>
+        <div class="absolute -bottom-20 -right-8 h-48 w-48 rounded-full bg-white/5"></div>
+        <div class="relative flex flex-col items-center gap-6 sm:flex-row">
           <div class="relative">
-            <div class="h-24 w-24 overflow-hidden rounded-full border-4 border-primary/10 bg-slate-200">
+            <div class="h-24 w-24 overflow-hidden rounded-full border-4 border-white/30 bg-white/20">
               <img
                 class="h-full w-full object-cover"
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuDld12pg3uP81sWSexPmi6RpfM_oQJAfsX4U3OH48IE3M-N8Pay03ZK1AgfOHZ2r96cPRKq9qtFLTHcB15S1ur1drQrfxn_XzxpMvoV0esEMJE5BkpvraDYYHpb4AwonHeknI0Vv8eJfhU3kjmKFRd5XuTCf2ZhHnuMauyFLcN-DSPRL0MK761Lki2lp2m81_HQOzsGvxcmYCN3rrW76GBbHjx_gZJ9Fcd7k7IKr0237y3TploYvv58RH_tnaOzH6VQ-A6rUUXPX79i"
-                alt="avatar"
+                alt="用户头像"
+                loading="lazy"
               />
             </div>
-            <div class="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-primary">
-              <span class="material-symbols-outlined text-[16px] text-white">edit</span>
+            <button class="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-white/90 text-primary transition-transform hover:scale-110">
+              <span class="material-symbols-outlined text-[16px]">edit</span>
+            </button>
+          </div>
+          <div class="text-center sm:text-left">
+            <h1 class="text-2xl font-black">{{ auth.user?.nickname || auth.user?.username }}</h1>
+            <div class="mt-1 flex items-center justify-center gap-3 sm:justify-start">
+              <span class="flex items-center gap-1 rounded-full bg-white/20 px-3 py-0.5 text-xs font-bold backdrop-blur-sm">
+                <span class="material-symbols-outlined text-sm text-yellow-300">star</span>
+                黄金会员
+              </span>
+              <span class="flex items-center gap-1 text-sm text-white/80">
+                <span class="material-symbols-outlined text-sm">phone_iphone</span>
+                {{ auth.user?.phone || '-' }}
+              </span>
             </div>
           </div>
-          <div class="space-y-1 text-center @[520px]:text-left">
-            <h1 class="text-2xl font-bold">{{ auth.user?.nickname || auth.user?.username }}</h1>
-            <div class="flex items-center justify-center gap-2 @[520px]:justify-start">
-              <span class="rounded bg-primary/20 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-primary">黄金会员</span>
-              <span class="text-sm text-slate-500">欢迎回来</span>
-            </div>
-            <p class="text-sm text-slate-500">手机号：{{ auth.user?.phone || '-' }}</p>
+          <div class="flex gap-2 sm:ml-auto">
+            <button class="rounded-xl bg-white/15 px-4 py-2 text-sm font-bold backdrop-blur-sm transition-colors hover:bg-white/25" @click="logout">
+              <span class="material-symbols-outlined mr-1 text-base">logout</span>
+              退出登录
+            </button>
           </div>
         </div>
       </section>
 
-      <section class="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <div class="group flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-primary/5 bg-white p-5 transition-all hover:border-primary/30">
-          <span class="material-symbols-outlined mb-1 text-primary transition-transform group-hover:scale-110">payments</span>
-          <span class="text-2xl font-bold">{{ orderStats.unpaid }}</span>
-          <span class="text-xs font-medium uppercase tracking-tighter text-slate-500">待付款</span>
-        </div>
-        <div class="group flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-primary/5 bg-white p-5 transition-all hover:border-primary/30">
-          <span class="material-symbols-outlined mb-1 text-primary transition-transform group-hover:scale-110">local_shipping</span>
-          <span class="text-2xl font-bold">{{ orderStats.paid }}</span>
-          <span class="text-xs font-medium uppercase tracking-tighter text-slate-500">待发货</span>
-        </div>
-        <div class="group flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-primary/5 bg-white p-5 transition-all hover:border-primary/30">
-          <span class="material-symbols-outlined mb-1 text-primary transition-transform group-hover:scale-110">inventory_2</span>
-          <span class="text-2xl font-bold">{{ orderStats.shipped }}</span>
-          <span class="text-xs font-medium uppercase tracking-tighter text-slate-500">待收货</span>
-        </div>
-        <div class="group flex cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border border-primary/5 bg-white p-5 transition-all hover:border-primary/30">
-          <span class="material-symbols-outlined mb-1 text-primary transition-transform group-hover:scale-110">task_alt</span>
-          <span class="text-2xl font-bold">{{ orderStats.completed }}</span>
-          <span class="text-xs font-medium uppercase tracking-tighter text-slate-500">已完成</span>
-        </div>
+      <section class="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <RouterLink to="/orders?tab=UNPAID" class="group flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-primary/5 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-md">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 transition-transform group-hover:scale-110">
+            <span class="material-symbols-outlined text-amber-500">payments</span>
+          </div>
+          <span class="text-3xl font-black">{{ String(orderStats.unpaid).padStart(2, '0') }}</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">待付款</span>
+        </RouterLink>
+        <RouterLink to="/orders?tab=PAID" class="group flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-primary/5 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-md">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 transition-transform group-hover:scale-110">
+            <span class="material-symbols-outlined text-blue-500">local_shipping</span>
+          </div>
+          <span class="text-3xl font-black">{{ String(orderStats.paid).padStart(2, '0') }}</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">待发货</span>
+        </RouterLink>
+        <RouterLink to="/orders?tab=SHIPPED" class="group flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-primary/5 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-md">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 transition-transform group-hover:scale-110">
+            <span class="material-symbols-outlined text-primary">inventory_2</span>
+          </div>
+          <span class="text-3xl font-black">{{ String(orderStats.shipped).padStart(2, '0') }}</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">待收货</span>
+        </RouterLink>
+        <RouterLink to="/orders?tab=COMPLETED" class="group flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-primary/5 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-md">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 transition-transform group-hover:scale-110">
+            <span class="material-symbols-outlined text-emerald-500">task_alt</span>
+          </div>
+          <span class="text-3xl font-black">{{ String(orderStats.completed).padStart(2, '0') }}</span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">已完成</span>
+        </RouterLink>
       </section>
 
       <section id="address" class="space-y-4">
-        <div class="flex items-center justify-between px-2">
-          <h2 class="flex items-center gap-2 text-lg font-bold">
+        <div class="flex items-center justify-between">
+          <h2 class="flex items-center gap-2 text-lg font-black">
             <span class="material-symbols-outlined text-primary">location_on</span>
             收货地址
           </h2>
         </div>
-        <div class="rounded-xl border border-primary/5 bg-white p-4">
-          <form class="grid grid-cols-1 gap-2 md:grid-cols-4" @submit.prevent="submitAddress">
-            <input v-model.trim="addressForm.receiverName" required placeholder="收件人" class="w-full rounded border border-slate-200 px-3 py-2 text-sm" />
-            <input v-model.trim="addressForm.receiverPhone" required placeholder="手机号" class="w-full rounded border border-slate-200 px-3 py-2 text-sm" />
-            <input v-model.trim="addressForm.detail" required placeholder="详细地址" class="w-full rounded border border-slate-200 px-3 py-2 text-sm md:col-span-2" />
-            <label class="flex items-center gap-2 rounded bg-slate-50 px-3 py-2 text-sm">
-              <input v-model="addressForm.isDefault" type="checkbox" />
+        <div class="rounded-2xl border border-primary/5 bg-white p-5 shadow-sm">
+          <form class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4" @submit.prevent="submitAddress">
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">person</span>
+              <input v-model.trim="addressForm.receiverName" required placeholder="收件人姓名" class="input-control !pl-9" />
+            </div>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">phone</span>
+              <input v-model.trim="addressForm.receiverPhone" required placeholder="手机号码" class="input-control !pl-9" />
+            </div>
+            <div class="relative md:col-span-2">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">home</span>
+              <input v-model.trim="addressForm.detail" required placeholder="详细地址" class="input-control !pl-9" />
+            </div>
+            <label class="flex cursor-pointer items-center gap-2 rounded-xl bg-primary/5 px-4 py-2.5 text-sm text-slate-600">
+              <input v-model="addressForm.isDefault" type="checkbox" class="h-4 w-4 rounded border-primary/30 text-primary focus:ring-primary" />
               设为默认地址
             </label>
             <div class="flex gap-2">
-              <button class="rounded bg-primary px-4 py-2 text-sm font-bold text-white" :disabled="addressSubmitting">
+              <button class="btn btn-primary !py-2.5" :disabled="addressSubmitting">
                 {{ addressSubmitting ? '提交中...' : editingAddressId ? '保存修改' : '新增地址' }}
               </button>
-              <button v-if="editingAddressId" type="button" class="rounded border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700" @click="resetAddressForm">取消</button>
+              <button v-if="editingAddressId" type="button" class="btn btn-outline !py-2.5" @click="resetAddressForm">取消</button>
             </div>
           </form>
         </div>
-        <div class="space-y-3">
-          <article v-for="item in addresses" :key="item.id" class="rounded-xl border border-primary/5 bg-white p-3">
-            <p class="text-sm leading-6">
-              {{ item.receiverName }} {{ item.receiverPhone }} - {{ item.detail }}
-              <span v-if="item.isDefault" class="ml-2 rounded bg-primary/10 px-2 py-0.5 text-xs text-primary">默认</span>
-            </p>
-            <div class="mt-2 flex flex-wrap gap-2">
-              <button class="rounded border border-slate-300 px-3 py-1 text-xs font-bold" @click="editAddress(item)">编辑</button>
-              <button class="rounded bg-primary/10 px-3 py-1 text-xs font-bold text-primary" :disabled="item.isDefault" @click="setDefaultAddress(item)">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <article v-for="item in addresses" :key="item.id" class="rounded-2xl border border-primary/5 bg-white p-5 shadow-sm transition-all hover:border-primary/20 hover:shadow-md">
+            <div class="mb-3 flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="font-bold text-slate-900">{{ item.receiverName }}</h4>
+                  <span v-if="item.isDefault" class="rounded-full bg-primary/15 px-2.5 py-0.5 text-[10px] font-bold text-primary">默认</span>
+                </div>
+                <p class="mt-0.5 text-sm text-slate-500">{{ item.receiverPhone }}</p>
+              </div>
+            </div>
+            <p class="mb-4 text-sm leading-relaxed text-slate-600">{{ item.detail }}</p>
+            <div class="flex gap-2 border-t border-slate-100 pt-3">
+              <button class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-50" @click="editAddress(item)">
+                <span class="material-symbols-outlined mr-1 text-xs">edit</span>编辑
+              </button>
+              <button class="rounded-lg bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20" :disabled="item.isDefault" @click="setDefaultAddress(item)">
                 设为默认
               </button>
-              <button class="rounded bg-red-50 px-3 py-1 text-xs font-bold text-red-600" @click="deleteAddress(item.id)">删除</button>
+              <button class="rounded-lg bg-red-50 px-3 py-1.5 text-xs font-bold text-red-500 transition-colors hover:bg-red-100" @click="deleteAddress(item.id)">
+                <span class="material-symbols-outlined mr-1 text-xs">delete</span>删除
+              </button>
             </div>
           </article>
-          <p v-if="!addresses.length" class="rounded-xl border border-dashed border-primary/20 bg-white p-6 text-center text-sm text-slate-500">暂无地址</p>
+          <button v-if="addresses.length < 5" class="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-primary/20 bg-white p-8 text-primary transition-colors hover:border-primary/40 hover:bg-primary/5" @click="resetAddressForm">
+            <span class="material-symbols-outlined text-3xl">add_circle</span>
+            <span class="text-sm font-bold">添加新地址</span>
+          </button>
         </div>
+        <p v-if="!addresses.length" class="rounded-2xl border-2 border-dashed border-primary/20 bg-white p-8 text-center text-sm text-slate-500">暂无地址，请添加收货地址</p>
       </section>
 
       <section id="favorite" class="space-y-4">
-        <div class="flex items-center justify-between px-2">
-          <h2 class="flex items-center gap-2 text-lg font-bold">
+        <div class="flex items-center justify-between">
+          <h2 class="flex items-center gap-2 text-lg font-black">
             <span class="material-symbols-outlined text-primary">favorite</span>
             我的收藏
           </h2>
         </div>
-        <div class="space-y-3">
-          <article v-for="item in favorites" :key="item.id" class="group flex items-center gap-4 rounded-xl border border-primary/5 bg-white p-3 transition-all hover:border-primary/20">
-            <RouterLink :to="`/product/${item.productId}`" class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-slate-100">
-              <img :src="item.productImage || fallbackImage" class="h-full w-full object-cover transition-transform group-hover:scale-110" />
+        <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <article v-for="item in favorites" :key="item.id" class="group overflow-hidden rounded-2xl border border-primary/5 bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+            <RouterLink :to="`/product/${item.productId}`" class="relative block aspect-square overflow-hidden bg-slate-100">
+              <img :src="item.productImage || fallbackImage" :alt="item.productName" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" />
+              <button class="absolute right-2 top-2 rounded-full bg-white/80 p-1.5 text-red-400 backdrop-blur-sm transition-colors hover:bg-white hover:text-red-500" @click.prevent="cancelFavorite(item.productId)">
+                <span class="material-symbols-outlined text-lg">favorite</span>
+              </button>
             </RouterLink>
-            <div class="min-w-0 flex-1">
-              <RouterLink :to="`/product/${item.productId}`" class="truncate text-sm font-bold hover:text-primary">{{ item.productName }}</RouterLink>
-              <p class="font-bold text-primary">¥{{ Number(item.price).toFixed(2) }}</p>
+            <div class="p-3">
+              <RouterLink :to="`/product/${item.productId}`" class="line-clamp-1 text-sm font-bold text-slate-900 hover:text-primary">{{ item.productName }}</RouterLink>
+              <div class="mt-2 flex items-center justify-between">
+                <span class="font-bold text-primary">¥{{ Number(item.price).toFixed(2) }}</span>
+                <button class="rounded-full bg-primary/10 p-1.5 text-primary transition-colors hover:bg-primary hover:text-white">
+                  <span class="material-symbols-outlined text-sm">add_shopping_cart</span>
+                </button>
+              </div>
             </div>
-            <button class="text-slate-300 transition-colors hover:text-red-500" @click="cancelFavorite(item.productId)">
-              <span class="material-symbols-outlined">delete</span>
-            </button>
           </article>
-          <p v-if="!favorites.length" class="rounded-xl border border-dashed border-primary/20 bg-white p-6 text-center text-sm text-slate-500">暂无收藏商品</p>
         </div>
+        <p v-if="!favorites.length" class="rounded-2xl border-2 border-dashed border-primary/20 bg-white p-8 text-center text-sm text-slate-500">暂无收藏商品</p>
       </section>
     </main>
   </div>
@@ -156,13 +170,14 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue';
-import { RouterLink, useRouter } from 'vue-router';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { addressApi, favoriteApi, orderApi } from '@/api';
 import { useAuthStore } from '@/stores/auth';
 import type { Address, FavoriteItem, OrderData } from '@/types/api';
 
 const auth = useAuthStore();
 const router = useRouter();
+const route = useRoute();
 const addresses = ref<Address[]>([]);
 const favorites = ref<FavoriteItem[]>([]);
 const orders = ref<OrderData[]>([]);
@@ -225,6 +240,10 @@ async function submitAddress() {
     }
     addresses.value = await addressApi.list();
     resetAddressForm();
+    const redirect = route.query.redirect as string | undefined;
+    if (redirect) {
+      router.push(redirect);
+    }
   } catch (error) {
     alert((error as Error).message);
   } finally {
@@ -273,5 +292,10 @@ function logout() {
 
 onMounted(() => {
   loadData().catch((error) => alert((error as Error).message));
+  if (route.query.tab === 'address') {
+    setTimeout(() => {
+      document.getElementById('address')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
+  }
 });
 </script>

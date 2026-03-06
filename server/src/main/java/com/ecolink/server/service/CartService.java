@@ -25,6 +25,7 @@ public class CartService {
         this.authService = authService;
     }
 
+    @Transactional(readOnly = true)
     public CartResponse list() {
         Long userId = SecurityUtils.currentUserId();
         List<CartItem> items = cartItemRepository.findByUserIdOrderByUpdatedAtDesc(userId);
@@ -73,6 +74,7 @@ public class CartService {
         cartItemRepository.delete(item);
     }
 
+    @Transactional(readOnly = true)
     public List<CartItem> findItemsForCurrentUser(List<Long> itemIds) {
         Long userId = SecurityUtils.currentUserId();
         if (itemIds == null || itemIds.isEmpty()) {

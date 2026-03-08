@@ -55,13 +55,13 @@ public class AuthService {
     }
 
     public UserMeResponse me() {
-        Long userId = SecurityUtils.currentUserId();
+        long userId = SecurityUtils.currentUserId();
         User user = userRepository.findById(userId).orElseThrow(() -> new BizException(4040, "用户不存在"));
         return toUserMe(user);
     }
 
     public User getCurrentUserEntity() {
-        Long userId = SecurityUtils.currentUserId();
+        long userId = SecurityUtils.currentUserId();
         return userRepository.findById(userId).orElseThrow(() -> new BizException(4040, "用户不存在"));
     }
 

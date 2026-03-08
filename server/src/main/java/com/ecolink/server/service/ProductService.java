@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Transactional(readOnly = true)
@@ -42,7 +43,7 @@ public class ProductService {
     }
 
     public PageResult<ProductItemResponse> listProducts(String keyword, Long categoryId, BigDecimal minPrice, BigDecimal maxPrice, String sort, int page, int size) {
-        Sort sortObj = buildSort(sort);
+        Sort sortObj = Objects.requireNonNull(buildSort(sort));
         Specification<Product> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("status"), ProductStatus.ON_SALE));

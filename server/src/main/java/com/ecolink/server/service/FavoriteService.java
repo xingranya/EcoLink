@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class FavoriteService {
@@ -34,10 +35,11 @@ public class FavoriteService {
     @Transactional
     public void add(Long productId) {
         Long userId = SecurityUtils.currentUserId();
-        if (favoriteRepository.existsByUserIdAndProductId(userId, productId)) {
+        Long safeProductId = Objects.requireNonNull(productId, "商品ID不能为空");
+        if (favoriteRepository.existsByUserIdAndProductId(userId, safeProductId)) {
             return;
         }
-        Product product = productRepository.findById(productId).orElseThrow(() -> new BizException(4041, "商品不存在"));
+        Product product = productRepository.findById(safeProductId).orElseThrow(() -> new BizException(4041, "商品不存在"));
         User user = authService.getCurrentUserEntity();
         Favorite favorite = new Favorite();
         favorite.setUser(user);

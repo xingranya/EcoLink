@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class CartService {
@@ -37,11 +38,12 @@ public class CartService {
     @Transactional
     public void add(AddCartItemRequest request) {
         Long userId = SecurityUtils.currentUserId();
-        Product product = productRepository.findById(request.productId()).orElseThrow(() -> new BizException(4041, "商品不存在"));
+        Long productId = Objects.requireNonNull(request.productId(), "商品ID不能为空");
+        Product product = productRepository.findById(productId).orElseThrow(() -> new BizException(4041, "商品不存在"));
         if (request.quantity() > product.getStock()) {
             throw new BizException(4005, "库存不足");
         }
-        CartItem item = cartItemRepository.findByUserIdAndProductId(userId, request.productId()).orElseGet(() -> {
+        CartItem item = cartItemRepository.findByUserIdAndProductId(userId, productId).orElseGet(() -> {
             CartItem ci = new CartItem();
             ci.setUser(authService.getCurrentUserEntity());
             ci.setProduct(product);
@@ -71,7 +73,7 @@ public class CartService {
     public void delete(Long itemId) {
         Long userId = SecurityUtils.currentUserId();
         CartItem item = cartItemRepository.findByIdAndUserId(itemId, userId).orElseThrow(() -> new BizException(4043, "购物车条目不存在"));
-        cartItemRepository.delete(item);
+        cartItemRepository.delete(Objects.requireNonNull(item));
     }
 
     @Transactional(readOnly = true)
@@ -85,7 +87,7 @@ public class CartService {
 
     @Transactional
     public void removeItems(List<CartItem> items) {
-        cartItemRepository.deleteAll(items);
+        cartItemRepository.deleteAll(Objects.requireNonNull(items, "购物车条目不能为空"));
     }
 
     private CartItemResponse toResponse(CartItem item) {

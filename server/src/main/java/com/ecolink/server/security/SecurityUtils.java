@@ -8,8 +8,7 @@ import org.springframework.security.core.userdetails.User;
 public final class SecurityUtils {
     private SecurityUtils() {}
 
-    @SuppressWarnings("null")
-    public static Long currentUserId() {
+    public static long currentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof User user)) {
             throw new BizException(4010, "请先登录");

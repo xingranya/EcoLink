@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class AddressService {
@@ -63,7 +64,7 @@ public class AddressService {
         Long userId = SecurityUtils.currentUserId();
         Address address = addressRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new BizException(4042, "地址不存在"));
-        addressRepository.delete(address);
+        addressRepository.delete(Objects.requireNonNull(address));
     }
 
     public Address findByIdForCurrentUser(Long id) {

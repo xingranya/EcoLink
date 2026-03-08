@@ -3,7 +3,7 @@
     <div class="relative hidden w-1/2 overflow-hidden lg:block">
       <img
         class="h-full w-full object-cover"
-        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyib461gtOaKEowAswTd0JbboU5fyBuB64WgYgVREdDUI4GH0utthvMaTEtsGwp35Wzr7P7SGeFVhvMyj_Vg3gtiMSbq__6hQ2HTMPBtKGHbs5voz1dx4uRqlG65s4lHNbHaWxpWHOZm5LsfE8NqCz6WWNZRS7p4EoLn1hRGFsF9IG2Nf_8eW7baYgzFl8Qlaop4le3BjU5EZVad6NUNMckza3-Pj3YbzQuKX4Jc-a1sbd7WQmroVWYEkw0adpmdjBby6qYnhNSCjC"
+        src="https://img1.tucang.cc/api/image/show/5195d2cb08996239e9829edb4c9579a9"
         alt="生态有机农场"
         loading="eager"
       />

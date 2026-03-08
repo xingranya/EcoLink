@@ -1,42 +1,44 @@
 <template>
   <div class="flex flex-1 flex-col bg-background-light">
     <main class="flex-grow">
-      <section class="relative h-[380px] w-full overflow-hidden lg:h-[420px]">
-        <div class="absolute inset-0 z-10 bg-gradient-to-r from-black/60 to-transparent"></div>
-        <img
-          class="h-full w-full object-cover"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyib461gtOaKEowAswTd0JbboU5fyBuB64WgYgVREdDUI4GH0utthvMaTEtsGwp35Wzr7P7SGeFVhvMyj_Vg3gtiMSbq__6hQ2HTMPBtKGHbs5voz1dx4uRqlG65s4lHNbHaWxpWHOZm5LsfE8NqCz6WWNZRS7p4EoLn1hRGFsF9IG2Nf_8eW7baYgzFl8Qlaop4le3BjU5EZVad6NUNMckza3-Pj3YbzQuKX4Jc-a1sbd7WQmroVWYEkw0adpmdjBby6qYnhNSCjC"
-          alt="生态农场"
-          loading="eager"
-        />
-        <div class="absolute inset-0 z-20 flex flex-col justify-center px-8 sm:px-16 lg:px-24">
-          <div class="max-w-xl">
-            <span class="mb-3 inline-block rounded-full bg-primary/30 px-4 py-1 text-xs font-semibold text-white backdrop-blur-md">100% 纯天然·生态种植</span>
-            <h2 class="mb-3 text-4xl font-black text-white lg:text-5xl">从田间到餐桌</h2>
-            <p class="mb-5 text-base leading-relaxed text-slate-100/90">
-              为您甄选全国各地优质原产地，拒绝化学农药，让每一口食材都回归自然本味。
-            </p>
-            <div class="mb-5 flex max-w-lg overflow-hidden rounded-xl bg-white/95 shadow-xl backdrop-blur-sm">
-              <div class="flex flex-1 items-center px-4">
-                <span class="material-symbols-outlined mr-2 text-slate-400">search</span>
-                <input
-                  v-model.trim="keyword"
-                  class="w-full border-none bg-transparent py-3 text-sm text-slate-800 placeholder-slate-400 focus:ring-0"
-                  placeholder="搜索有机蔬菜、当季水果、原产地特产..."
-                  type="text"
-                  aria-label="首页商品搜索"
-                  @keydown.enter="goSearch"
-                />
+      <section class="px-4 pt-4 sm:px-6 lg:px-8 lg:pt-6">
+        <div class="relative mx-auto h-[380px] max-w-7xl overflow-hidden rounded-2xl shadow-lg lg:h-[460px] lg:rounded-3xl lg:shadow-2xl">
+          <div class="absolute inset-0 z-10 bg-gradient-to-r from-black/60 to-transparent"></div>
+          <img
+            class="h-full w-full object-cover"
+            src="https://img1.tucang.cc/api/image/show/5195d2cb08996239e9829edb4c9579a9"
+            alt="生态农场"
+            loading="eager"
+          />
+          <div class="absolute inset-0 z-20 flex flex-col justify-center px-8 sm:px-16 lg:px-24">
+            <div class="max-w-xl">
+              <span class="mb-3 inline-block rounded-full bg-primary/30 px-4 py-1 text-xs font-semibold text-white backdrop-blur-md">100% 纯天然·生态种植</span>
+              <h2 class="mb-3 text-4xl font-black text-white lg:text-5xl">从田间到餐桌</h2>
+              <p class="mb-5 text-base leading-relaxed text-slate-100/90">
+                为您甄选全国各地优质原产地，拒绝化学农药，让每一口食材都回归自然本味。
+              </p>
+              <div class="mb-5 flex max-w-lg overflow-hidden rounded-xl bg-white/95 shadow-xl backdrop-blur-sm">
+                <div class="flex flex-1 items-center px-4">
+                  <span class="material-symbols-outlined mr-2 text-slate-400">search</span>
+                  <input
+                    v-model.trim="keyword"
+                    class="w-full border-none bg-transparent py-3 text-sm text-slate-800 placeholder-slate-400 focus:ring-0"
+                    placeholder="搜索有机蔬菜、当季水果、原产地特产..."
+                    type="text"
+                    aria-label="首页商品搜索"
+                    @keydown.enter="goSearch"
+                  />
+                </div>
+                <button class="bg-primary px-6 text-sm font-bold text-white transition-colors hover:bg-primary/90" @click="goSearch">搜索</button>
               </div>
-              <button class="bg-primary px-6 text-sm font-bold text-white transition-colors hover:bg-primary/90" @click="goSearch">搜索</button>
-            </div>
-            <div class="flex gap-3">
-              <RouterLink to="/search" class="rounded-lg bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-transform hover:scale-105">
-                立即选购
-              </RouterLink>
-              <RouterLink to="/profile" class="rounded-lg border border-white/20 bg-white/10 px-6 py-2.5 text-sm font-bold text-white backdrop-blur-md transition-all hover:bg-white/20">
-                了解溯源
-              </RouterLink>
+              <div class="flex gap-3">
+                <RouterLink to="/search" class="rounded-lg bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-transform hover:scale-105">
+                  立即选购
+                </RouterLink>
+                <RouterLink to="/profile" class="rounded-lg border border-white/20 bg-white/10 px-6 py-2.5 text-sm font-bold text-white backdrop-blur-md transition-all hover:bg-white/20">
+                  了解溯源
+                </RouterLink>
+              </div>
             </div>
           </div>
         </div>
@@ -112,7 +114,7 @@
           </div>
           <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
             <div class="group relative h-60 overflow-hidden rounded-2xl shadow-md lg:h-72">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKe3IwiFeeMM27__mq-5PL-XZDIDWn8S_8LewGuW19rb_-fSUI48y8qJVz0vQzjSaMHb57CcWKoszrNtHMsbbX3LafrN7IXHLN4emGZ8zQcLtPftj8CnDiu45eYRqgCOX7O6DASvO9TYD7P3bkiMEgDvtULiIGuDYGAX_vQrRZZqi4NqNPP5vIUj1ZsOmg9d8vxFP6uhUi-cZRIdZGMLVv-NiSS9i11UHf6NVPS_x8HlFehkDXBkm8v8Z2hBWqApdWQ84YcvOA5a-6" alt="云南高原精品水果" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+              <img src="https://img1.tucang.cc/api/image/show/d2cd87bd4ecd296fba3dc5a1a71339de" alt="云南高原精品水果" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
               <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
               <div class="absolute bottom-0 left-0 p-6">
                 <span class="mb-2 inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm">云南</span>
@@ -121,7 +123,7 @@
               </div>
             </div>
             <div class="group relative h-60 overflow-hidden rounded-2xl shadow-md lg:h-72">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkQxqFuyJp4qDAKv95TU_yEofkW9bHxV5xmdfOIXMLBaXfLVHxUvpPRYUtPHD824wrvAXmmraVboRueLlWFkEpU0Mh31JvquCwSNfdJ2jWthwtt9IAdSdbbjVc26P2HNrt5tA57id2BzMwxTS96OjC3zGNJlYOAZOyZNpvAkZU1oyV9rzk_vwDwht0iQHjgvm86ilXi9o6Gv6CVlAkQrH1zvbpTySuSCXAqjLJFtKEfhyVqHM0gCKEog_fAyDoxXrOf-p18J0n3u9G" alt="山东烟台苹果" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+              <img src="https://img1.tucang.cc/api/image/show/a050cab6c8b24666cf4fde10b4174ad3" alt="山东烟台苹果" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
               <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
               <div class="absolute bottom-0 left-0 p-6">
                 <span class="mb-2 inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm">山东</span>
@@ -130,7 +132,7 @@
               </div>
             </div>
             <div class="group relative h-60 overflow-hidden rounded-2xl shadow-md lg:h-72">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcBKLfQLN8g6x6HkgprK1J9zbHfffrF_M5p7dz7zQtWC-FsdkX8Jdrwk_b6Z1m9Ckzwr_Ie-qV-ifZUk-bi-LFpoe6zMvdykUtgnIgw1yoDaNv3tO8jpbsjdg4lAZh3tNeerKAftPlCs0WMBH2Y-8wYTk7x6dKdkkqr06Cvuk5SUUCoj8PugT43jkgvn2kEeuc8AaC3TMr89dINDs2zAPh7uufxhd3kUW9B6YG5_btWtUDOB5QMFwMSaZz4mRY9X2yIty5i529NAnX" alt="丹东草莓" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+              <img src="https://img1.tucang.cc/api/image/show/97c1195c4235a01ded5b8a399f6f9812" alt="丹东草莓" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
               <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
               <div class="absolute bottom-0 left-0 p-6">
                 <span class="mb-2 inline-block rounded-full bg-white/20 px-3 py-1 text-xs font-bold text-white backdrop-blur-sm">辽宁</span>

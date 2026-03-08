@@ -9,7 +9,7 @@
             <div class="h-24 w-24 overflow-hidden rounded-full border-4 border-white/30 bg-white/20">
               <img
                 class="h-full w-full object-cover"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDld12pg3uP81sWSexPmi6RpfM_oQJAfsX4U3OH48IE3M-N8Pay03ZK1AgfOHZ2r96cPRKq9qtFLTHcB15S1ur1drQrfxn_XzxpMvoV0esEMJE5BkpvraDYYHpb4AwonHeknI0Vv8eJfhU3kjmKFRd5XuTCf2ZhHnuMauyFLcN-DSPRL0MK761Lki2lp2m81_HQOzsGvxcmYCN3rrW76GBbHjx_gZJ9Fcd7k7IKr0237y3TploYvv58RH_tnaOzH6VQ-A6rUUXPX79i"
+                src="https://img1.tucang.cc/api/image/show/3c24a83d2cac00178a1fba68decd7150"
                 alt="用户头像"
                 loading="lazy"
               />

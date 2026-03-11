@@ -10,3 +10,6 @@ coverage/
 
 # Windows reserved device name (invalid path for git on Windows)
 nul
+
+# 本地 Maven 缓存目录（避免误提交依赖）
+.m2repo/

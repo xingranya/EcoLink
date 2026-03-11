@@ -1,0 +1,8 @@
+[submodule "yudao-admin-server"]
+	path = yudao-admin-server
+	url = https://gitee.com/yudaocode/yudao-boot-mini.git
+	branch = master-jdk17
+[submodule "yudao-ui-admin"]
+	path = yudao-ui-admin
+	url = https://gitee.com/yudaocode/yudao-ui-admin-vue3.git
+	branch = master

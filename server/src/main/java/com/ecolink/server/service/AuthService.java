@@ -38,7 +38,7 @@ public class AuthService {
         user.setPhone(request.phone());
         user.setStatus(UserStatus.ACTIVE);
         userRepository.save(user);
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getUsername());
+        String token = jwtTokenProvider.generateToken(user.getId(), user.getUsername(), user.getRole());
         return new AuthResponse(token, toUserMe(user));
     }
 
@@ -50,7 +50,7 @@ public class AuthService {
         if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new BizException(4003, "账号或密码错误");
         }
-        String token = jwtTokenProvider.generateToken(user.getId(), user.getUsername());
+        String token = jwtTokenProvider.generateToken(user.getId(), user.getUsername(), user.getRole());
         return new AuthResponse(token, toUserMe(user));
     }
 
@@ -66,6 +66,6 @@ public class AuthService {
     }
 
     private UserMeResponse toUserMe(User user) {
-        return new UserMeResponse(user.getId(), user.getUsername(), user.getNickname(), user.getPhone());
+        return new UserMeResponse(user.getId(), user.getUsername(), user.getNickname(), user.getPhone(), user.getRole());
     }
 }

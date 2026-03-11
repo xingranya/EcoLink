@@ -17,6 +17,7 @@ export interface UserMe {
   username: string;
   nickname: string;
   phone?: string;
+  role?: string;
 }
 
 export interface AuthResult {

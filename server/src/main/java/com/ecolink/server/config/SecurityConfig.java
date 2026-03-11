@@ -45,6 +45,7 @@ public class SecurityConfig {
                                 "/api/v1/categories/**",
                                 "/api/v1/products/**"
                         ).permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

@@ -8,6 +8,7 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<UserMe | null>(null);
 
   const isLogin = computed(() => Boolean(token.value));
+  const isAdmin = computed(() => user.value?.role === 'ADMIN');
 
   function setSession(newToken: string, newUser: UserMe) {
     token.value = newToken;
@@ -40,9 +41,11 @@ export const useAuthStore = defineStore('auth', () => {
     token,
     user,
     isLogin,
+    isAdmin,
     login,
     register,
     fetchMe,
     clearSession,
+    setSession,
   };
 });

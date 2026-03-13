@@ -37,7 +37,7 @@ public class AdminCategoryController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<Category> update(@PathVariable Long id, @Valid @RequestBody CategoryReq req) {
+    public ApiResponse<Category> update(@PathVariable long id, @Valid @RequestBody CategoryReq req) {
         Category cat = categoryRepository.findById(id)
                 .orElseThrow(() -> new BizException(4040, "分类不存在"));
         cat.setName(req.name());
@@ -47,7 +47,7 @@ public class AdminCategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable Long id) {
+    public ApiResponse<Void> delete(@PathVariable long id) {
         categoryRepository.deleteById(id);
         return ApiResponse.ok(null);
     }

@@ -153,10 +153,12 @@ import { computed, onMounted, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { addressApi, cartApi, orderApi, productApi } from '@/api';
 import { useCartStore } from '@/stores/cart';
+import { useToastStore } from '@/stores/toast';
 import type { ProductItem } from '@/types/api';
 
 const router = useRouter();
 const cart = useCartStore();
+const toast = useToastStore();
 const selectedIds = ref<number[]>([]);
 const loading = ref(false);
 const suggestProducts = ref<ProductItem[]>([]);
@@ -183,7 +185,7 @@ async function changeQty(itemId: number, qty: number) {
     await cartApi.update(itemId, { quantity: qty });
     await reload();
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   }
 }
 
@@ -192,7 +194,7 @@ async function remove(itemId: number) {
     await cartApi.remove(itemId);
     await reload();
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   }
 }
 
@@ -200,15 +202,15 @@ async function addSuggest(productId: number) {
   try {
     await cartApi.add({ productId, quantity: 1 });
     await reload();
-    alert('已加入购物车');
+    toast.success('已加入购物车');
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   }
 }
 
 async function checkout() {
   if (selectedIds.value.length === 0) {
-    alert('请选择要下单的商品');
+    toast.info('请选择要下单的商品');
     return;
   }
   loading.value = true;
@@ -216,15 +218,16 @@ async function checkout() {
     const addresses = await addressApi.list();
     const address = addresses.find((item) => item.isDefault) || addresses[0];
     if (!address) {
-      alert('请先添加收货地址，添加后将自动跳回结算');
+      toast.info('请先添加收货地址，添加后将自动跳回结算');
       router.push({ name: 'profile', query: { tab: 'address', redirect: '/cart' } });
       return;
     }
     const order = await orderApi.create({ addressId: address.id, cartItemIds: selectedIds.value });
     await reload();
+    toast.success('订单创建成功，正在前往支付');
     router.push(`/payment/${order.id}`);
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   } finally {
     loading.value = false;
   }
@@ -235,7 +238,7 @@ onMounted(async () => {
     await reload();
     suggestProducts.value = await productApi.list({ page: 1, size: 4, sort: 'latest' }).then((res) => res.list);
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   }
 });
 </script>

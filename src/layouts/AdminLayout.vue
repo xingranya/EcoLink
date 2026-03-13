@@ -25,6 +25,10 @@
         </RouterLink>
       </nav>
       <div class="sidebar-footer">
+        <RouterLink to="/" class="nav-item" active-class="">
+          <span class="material-symbols-outlined">storefront</span>
+          <span>返回商城</span>
+        </RouterLink>
         <button class="nav-item logout-btn" @click="handleLogout">
           <span class="material-symbols-outlined">logout</span>
           <span>退出登录</span>
@@ -34,8 +38,12 @@
     <!-- 主内容 -->
     <main class="main-content">
       <header class="topbar">
-        <h2 class="page-title">{{ pageTitle }}</h2>
+        <div>
+          <h2 class="page-title">{{ pageTitle }}</h2>
+          <p class="page-subtitle">EcoLink 管理后台</p>
+        </div>
         <div class="user-info">
+          <span class="admin-badge">ADMIN</span>
           <span class="material-symbols-outlined">admin_panel_settings</span>
           <span>{{ auth.user?.nickname || '管理员' }}</span>
         </div>
@@ -187,12 +195,30 @@ function handleLogout() {
   color: #1a1a2e;
 }
 
+.page-subtitle {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #94a3b8;
+}
+
 .user-info {
   display: flex;
   align-items: center;
   gap: 8px;
   color: #6b7280;
   font-size: 14px;
+}
+
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .content-body {

@@ -8,7 +8,8 @@
         </div>
         <h1 class="mb-2 text-2xl font-black text-slate-900">支付成功</h1>
         <p class="mb-1 text-slate-500">订单号: {{ order?.orderNo }}</p>
-        <p class="mb-8 text-sm text-slate-400">商家将尽快为您安排发货</p>
+        <p class="mb-2 text-sm text-slate-400">商家将尽快为您安排发货</p>
+        <p class="mb-8 text-xs text-primary/70">{{ redirectMessage }}</p>
         <div class="flex justify-center gap-4">
           <RouterLink to="/orders" class="btn btn-primary">查看订单</RouterLink>
           <RouterLink to="/" class="btn btn-outline">继续购物</RouterLink>
@@ -166,10 +167,12 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { orderApi } from '@/api';
+import { useToastStore } from '@/stores/toast';
 import type { OrderData } from '@/types/api';
 
 const route = useRoute();
 const router = useRouter();
+const toast = useToastStore();
 const order = ref<OrderData | null>(null);
 const loading = ref(true);
 const paying = ref(false);
@@ -177,6 +180,7 @@ const paySuccess = ref(false);
 const selectedMethod = ref('wechat');
 const countdown = ref(15 * 60);
 const fallbackImage = 'https://images.unsplash.com/photo-1608797178974-15b35a64ede9?auto=format&fit=crop&w=1200&q=80';
+const redirectSeconds = ref(3);
 
 const paymentMethods = [
   { id: 'wechat', label: '微信支付', icon: 'chat', color: 'text-green-500' },
@@ -190,7 +194,10 @@ const countdownDisplay = computed(() => {
   return `${m}:${s}`;
 });
 
+const redirectMessage = computed(() => `支付完成后 ${redirectSeconds.value} 秒自动跳转订单页`);
+
 let timer: ReturnType<typeof setInterval> | null = null;
+let successTimer: ReturnType<typeof setInterval> | null = null;
 
 function startCountdown() {
   timer = setInterval(() => {
@@ -206,11 +213,20 @@ async function confirmPay() {
   if (!order.value) return;
   paying.value = true;
   try {
-    await orderApi.pay(order.value.id);
+    order.value = await orderApi.pay(order.value.id);
     paySuccess.value = true;
+    toast.success('支付成功');
     if (timer) clearInterval(timer);
+    successTimer = setInterval(() => {
+      if (redirectSeconds.value <= 1) {
+        if (successTimer) clearInterval(successTimer);
+        router.replace('/orders?tab=PAID');
+        return;
+      }
+      redirectSeconds.value--;
+    }, 1000);
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   } finally {
     paying.value = false;
   }
@@ -225,12 +241,13 @@ onMounted(async () => {
   try {
     order.value = await orderApi.detail(orderId);
     if (order.value.status !== 'UNPAID') {
+      toast.info('该订单已处理，已为你跳转到订单列表');
       router.replace('/orders');
       return;
     }
     startCountdown();
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   } finally {
     loading.value = false;
   }
@@ -238,5 +255,6 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (timer) clearInterval(timer);
+  if (successTimer) clearInterval(successTimer);
 });
 </script>

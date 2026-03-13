@@ -10,12 +10,15 @@ import com.ecolink.server.repository.ProductRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -41,14 +44,20 @@ public class AdminProductController {
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String status) {
         PageRequest pageReq = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
-        Page<Product> result;
-        if (keyword != null && !keyword.isBlank()) {
-            result = productRepository.findByNameContaining(keyword, pageReq);
-        } else if (categoryId != null) {
-            result = productRepository.findByCategoryId(categoryId, pageReq);
-        } else {
-            result = productRepository.findAll(pageReq);
-        }
+        Specification<Product> specification = (root, query, cb) -> {
+            var predicates = new ArrayList<Predicate>();
+            if (keyword != null && !keyword.isBlank()) {
+                predicates.add(cb.like(root.get("name"), "%" + keyword.trim() + "%"));
+            }
+            if (categoryId != null) {
+                predicates.add(cb.equal(root.get("category").get("id"), categoryId));
+            }
+            if (status != null && !status.isBlank()) {
+                predicates.add(cb.equal(root.get("status"), ProductStatus.valueOf(status)));
+            }
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+        Page<Product> result = productRepository.findAll(specification, pageReq);
         Map<String, Object> data = Map.of(
                 "content", result.getContent(),
                 "totalElements", result.getTotalElements(),
@@ -58,9 +67,20 @@ public class AdminProductController {
         return ApiResponse.ok(data);
     }
 
+    @GetMapping("/{id}")
+    public ApiResponse<Product> detail(@PathVariable long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new BizException(4040, "商品不存在"));
+        return ApiResponse.ok(product);
+    }
+
     @PostMapping
     public ApiResponse<Product> create(@Valid @RequestBody ProductReq req) {
-        Category category = categoryRepository.findById(req.categoryId())
+        Long categoryId = req.categoryId();
+        if (categoryId == null) {
+            throw new BizException(4000, "分类不能为空");
+        }
+        Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new BizException(4040, "分类不存在"));
         Product product = new Product();
         product.setCategory(category);
@@ -75,11 +95,12 @@ public class AdminProductController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<Product> update(@PathVariable Long id, @Valid @RequestBody ProductReq req) {
+    public ApiResponse<Product> update(@PathVariable long id, @Valid @RequestBody ProductReq req) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new BizException(4040, "商品不存在"));
         if (req.categoryId() != null) {
-            Category category = categoryRepository.findById(req.categoryId())
+            Long categoryId = req.categoryId();
+            Category category = categoryRepository.findById(categoryId)
                     .orElseThrow(() -> new BizException(4040, "分类不存在"));
             product.setCategory(category);
         }
@@ -94,7 +115,7 @@ public class AdminProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ApiResponse<Void> delete(@PathVariable Long id) {
+    public ApiResponse<Void> delete(@PathVariable long id) {
         productRepository.deleteById(id);
         return ApiResponse.ok(null);
     }

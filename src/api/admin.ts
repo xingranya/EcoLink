@@ -1,15 +1,41 @@
 import http from './http';
 
+export interface AdminDashboardStats {
+  productCount: number;
+  orderCount: number;
+  userCount: number;
+  categoryCount: number;
+  onSaleProductCount: number;
+  offSaleProductCount: number;
+  lowStockProductCount: number;
+  unpaidOrderCount: number;
+  paidOrderCount: number;
+  shippedOrderCount: number;
+  completedOrderCount: number;
+  revenueAmount: number;
+  recentOrders: Array<{
+    id: number;
+    orderNo: string;
+    status: string;
+    receiverName: string;
+    totalAmount: number;
+    createdAt: string;
+  }>;
+  hotProducts: Array<{
+    id: number;
+    name: string;
+    sales: number;
+    stock: number;
+    status: string;
+    mainImage?: string;
+  }>;
+}
+
 /** 后台管理 API */
 export const adminApi = {
   /** 仪表盘统计 */
   dashboard() {
-    return http.get<{
-      productCount: number;
-      orderCount: number;
-      userCount: number;
-      categoryCount: number;
-    }>('/admin/dashboard');
+    return http.get<AdminDashboardStats>('/admin/dashboard');
   },
 
   /** 分类列表 */
@@ -34,6 +60,9 @@ export const adminApi = {
       totalPages: number;
       number: number;
     }>('/admin/products', params);
+  },
+  productDetail(id: number) {
+    return http.get<any>(`/admin/products/${id}`);
   },
   productCreate(data: any) {
     return http.post('/admin/products', data);

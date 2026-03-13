@@ -28,6 +28,8 @@ export interface AuthResult {
 export interface Category {
   id: number;
   name: string;
+  sort?: number;
+  enabled?: boolean;
 }
 
 export interface ProductItem {
@@ -40,6 +42,7 @@ export interface ProductItem {
   stock: number;
   sales: number;
   mainImage?: string;
+  status?: string;
 }
 
 export interface ProductDetail extends ProductItem {
@@ -100,6 +103,8 @@ export interface OrderData {
   receiverPhone: string;
   receiverAddress: string;
   paidAt?: string;
+  shippedAt?: string;
+  completedAt?: string;
   createdAt: string;
   items: OrderItem[];
 }

@@ -15,6 +15,8 @@ public record OrderResponse(
         String receiverPhone,
         String receiverAddress,
         LocalDateTime paidAt,
+        LocalDateTime shippedAt,
+        LocalDateTime completedAt,
         LocalDateTime createdAt,
         List<OrderItemResponse> items
 ) {}

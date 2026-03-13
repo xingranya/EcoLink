@@ -162,11 +162,13 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { favoriteApi, cartApi, productApi } from '@/api';
 import { useCartStore } from '@/stores/cart';
+import { useToastStore } from '@/stores/toast';
 import type { Category, ProductItem } from '@/types/api';
 
 const route = useRoute();
 const router = useRouter();
 const cart = useCartStore();
+const toast = useToastStore();
 const keyword = ref('');
 const categoryId = ref(0);
 const sort = ref('comprehensive');
@@ -213,7 +215,7 @@ async function loadProducts() {
       },
     });
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   } finally {
     loading.value = false;
   }
@@ -232,18 +234,18 @@ async function addCart(productId: number) {
   try {
     await cartApi.add({ productId, quantity: 1 });
     cart.reload().catch(() => undefined);
-    alert('已加入购物车');
+    toast.success('已加入购物车');
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   }
 }
 
 async function favorite(productId: number) {
   try {
     await favoriteApi.add(productId);
-    alert('已收藏');
+    toast.success('已收藏商品');
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   }
 }
 
@@ -257,7 +259,7 @@ onMounted(async () => {
     syncFromQuery();
     await loadProducts();
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   }
 });
 </script>

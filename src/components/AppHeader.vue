@@ -24,6 +24,15 @@
       </nav>
 
       <div class="flex items-center gap-2 sm:gap-3">
+        <RouterLink
+          v-if="auth.isAdmin"
+          to="/admin/dashboard"
+          class="hidden items-center gap-1 rounded-xl bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20 lg:inline-flex"
+        >
+          <span class="material-symbols-outlined text-sm">admin_panel_settings</span>
+          后台
+        </RouterLink>
+
         <RouterLink to="/cart" class="relative rounded-xl p-2 transition-colors hover:bg-primary/10" aria-label="购物车">
           <span class="material-symbols-outlined">shopping_cart</span>
           <span
@@ -63,6 +72,14 @@
           @click="mobileOpen = false"
         >
           {{ item.label }}
+        </RouterLink>
+        <RouterLink
+          v-if="auth.isAdmin"
+          to="/admin/dashboard"
+          class="rounded-lg bg-primary/10 px-3 py-2 text-sm font-bold text-primary"
+          @click="mobileOpen = false"
+        >
+          进入后台
         </RouterLink>
       </div>
     </nav>

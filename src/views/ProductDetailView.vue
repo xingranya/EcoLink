@@ -91,6 +91,18 @@
               <span class="text-sm font-medium">正品保障</span>
             </div>
           </div>
+
+          <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <article
+              v-for="metric in summaryMetrics"
+              :key="metric.label"
+              class="rounded-2xl border border-primary/10 bg-white p-4 shadow-sm"
+            >
+              <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{{ metric.label }}</p>
+              <p class="mt-3 text-base font-black text-slate-900">{{ metric.value }}</p>
+              <p class="mt-2 text-xs leading-5 text-slate-500">{{ metric.description }}</p>
+            </article>
+          </div>
         </div>
       </div>
 
@@ -154,6 +166,52 @@
           </div>
         </div>
 
+        <div class="mt-10 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+          <section class="rounded-2xl border border-primary/10 bg-white p-8 shadow-sm">
+            <h3 class="mb-6 flex items-center gap-2 text-xl font-black">
+              <span class="material-symbols-outlined text-primary">star</span>
+              推荐理由
+            </h3>
+            <div class="space-y-4">
+              <article
+                v-for="item in detailHighlights"
+                :key="item.title"
+                class="rounded-2xl bg-background-light p-4"
+              >
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-outlined rounded-xl bg-primary/10 p-2 text-primary">{{ item.icon }}</span>
+                  <div>
+                    <p class="font-bold text-slate-900">{{ item.title }}</p>
+                    <p class="mt-1 text-sm leading-6 text-slate-500">{{ item.description }}</p>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 shadow-sm">
+            <h3 class="mb-6 flex items-center gap-2 text-xl font-black text-slate-900">
+              <span class="material-symbols-outlined text-emerald-600">route</span>
+              履约与溯源路径
+            </h3>
+            <div class="space-y-4">
+              <article
+                v-for="node in supplySteps"
+                :key="node.title"
+                class="flex gap-4 rounded-2xl bg-white/80 p-4"
+              >
+                <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-black text-emerald-700">
+                  {{ node.step }}
+                </div>
+                <div>
+                  <p class="font-bold text-slate-900">{{ node.title }}</p>
+                  <p class="mt-1 text-sm leading-6 text-slate-500">{{ node.description }}</p>
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
+
         <div id="section-trace" class="mt-10 flex flex-col items-center gap-10 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-8 md:flex-row">
           <div class="flex-1">
             <h3 class="mb-2 text-xl font-black">溯源信息 (Traceability Information)</h3>
@@ -176,7 +234,7 @@
           <div class="flex h-36 w-full items-center justify-center rounded-xl bg-white p-6 shadow-inner md:w-64">
             <div class="text-center">
               <p class="text-xs font-bold uppercase tracking-wider text-slate-400">批次编号</p>
-              <p class="mt-1 text-lg font-black tracking-widest text-primary">EC-{{ new Date().getFullYear() }}-{{ String(product.id).padStart(3, '0') }}</p>
+              <p class="mt-1 text-lg font-black tracking-widest text-primary">{{ traceCode }}</p>
               <p class="mt-2 text-xs italic text-slate-500">采摘日期：{{ new Date(Date.now() - 3 * 86400000).toLocaleDateString('zh-CN') }}</p>
               <p class="text-xs italic text-slate-500">产地：{{ product.categoryName || '精选产区' }}</p>
             </div>
@@ -205,13 +263,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 import { cartApi, favoriteApi, productApi } from '@/api';
 import { useCartStore } from '@/stores/cart';
+import { useToastStore } from '@/stores/toast';
 import type { ProductDetail, ProductItem } from '@/types/api';
 
 const route = useRoute();
+const toast = useToastStore();
 const product = ref<ProductDetail | null>(null);
 const activeImage = ref('');
 const quantity = ref(1);
@@ -221,6 +281,79 @@ const favoriteLoading = ref(false);
 const relatedProducts = ref<ProductItem[]>([]);
 const cart = useCartStore();
 const fallbackImage = 'https://images.unsplash.com/photo-1608797178974-15b35a64ede9?auto=format&fit=crop&w=1200&q=80';
+
+const traceCode = computed(() => {
+  if (!product.value) return '';
+  return `EC-${new Date().getFullYear()}-${String(product.value.id).padStart(3, '0')}`;
+});
+
+const summaryMetrics = computed(() => {
+  if (!product.value) return [];
+  return [
+    {
+      label: '原产地标签',
+      value: product.value.categoryName || '生态优选产区',
+      description: '分类、产地与详情展示联动，便于讲解前台信息组织方式。',
+    },
+    {
+      label: '累计销量',
+      value: `${product.value.sales} 件`,
+      description: '订单创建成功后销量自动回写，支撑热销推荐与后台统计。',
+    },
+    {
+      label: '当前库存',
+      value: `${product.value.stock} 件`,
+      description: '加购与下单都会校验库存，库存不足时会阻断核心流程。',
+    },
+    {
+      label: '溯源批次',
+      value: traceCode.value,
+      description: '通过批次编号、采摘日期和配送节点形成可讲的溯源能力。',
+    },
+  ];
+});
+
+const detailHighlights = computed(() => {
+  if (!product.value) return [];
+  return [
+    {
+      icon: 'forest',
+      title: '生态产地直采',
+      description: `围绕 ${product.value.categoryName || '优质产区'} 进行主题化展示，突出绿色种植与源头供应。`,
+    },
+    {
+      icon: 'inventory_2',
+      title: '库存销量实时可见',
+      description: `当前库存 ${product.value.stock} 件，累计销量 ${product.value.sales} 件，方便说明业务数据回写机制。`,
+    },
+    {
+      icon: 'local_shipping',
+      title: '冷链履约说明',
+      description: '统一展示冷链配送、品质保障与正品承诺，增强生鲜电商场景可信度。',
+    },
+  ];
+});
+
+const supplySteps = computed(() => {
+  if (!product.value) return [];
+  return [
+    {
+      step: '01',
+      title: '产地采收',
+      description: `批次 ${traceCode.value} 对应商品从原产地采收进入平台质检，清晰呈现源头可追溯链路。`,
+    },
+    {
+      step: '02',
+      title: '入仓质检',
+      description: '平台在入仓阶段维护主图、规格、库存等核心字段，前后台共享同一份商品数据。',
+    },
+    {
+      step: '03',
+      title: '订单履约',
+      description: '用户下单后库存减少、销量增加，支付后可在后台完成发货和收尾管理。',
+    },
+  ];
+});
 
 async function loadDetail() {
   loading.value = true;
@@ -240,9 +373,9 @@ async function addCart() {
   try {
     await cartApi.add({ productId: product.value.id, quantity: quantity.value });
     cart.reload().catch(() => undefined);
-    alert('加入购物车成功');
+    toast.success('加入购物车成功');
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   } finally {
     cartLoading.value = false;
   }
@@ -253,9 +386,9 @@ async function favorite() {
   favoriteLoading.value = true;
   try {
     await favoriteApi.add(product.value.id);
-    alert('收藏成功');
+    toast.success('收藏成功');
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   } finally {
     favoriteLoading.value = false;
   }
@@ -264,13 +397,13 @@ async function favorite() {
 async function favoriteRelated(productId: number) {
   try {
     await favoriteApi.add(productId);
-    alert('收藏成功');
+    toast.success('收藏成功');
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   }
 }
 
 onMounted(() => {
-  loadDetail().catch((error) => alert((error as Error).message));
+  loadDetail().catch((error) => toast.error((error as Error).message));
 });
 </script>

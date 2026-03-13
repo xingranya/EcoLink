@@ -32,6 +32,14 @@
             </div>
           </div>
           <div class="flex gap-2 sm:ml-auto">
+            <RouterLink
+              v-if="auth.isAdmin"
+              to="/admin/dashboard"
+              class="rounded-xl bg-white px-4 py-2 text-sm font-bold text-primary transition-colors hover:bg-white/90"
+            >
+              <span class="material-symbols-outlined mr-1 text-base">admin_panel_settings</span>
+              进入后台
+            </RouterLink>
             <button class="rounded-xl bg-white/15 px-4 py-2 text-sm font-bold backdrop-blur-sm transition-colors hover:bg-white/25" @click="logout">
               <span class="material-symbols-outlined mr-1 text-base">logout</span>
               退出登录
@@ -173,11 +181,13 @@ import { computed, onMounted, reactive, ref } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { addressApi, favoriteApi, orderApi } from '@/api';
 import { useAuthStore } from '@/stores/auth';
+import { useToastStore } from '@/stores/toast';
 import type { Address, FavoriteItem, OrderData } from '@/types/api';
 
 const auth = useAuthStore();
 const router = useRouter();
 const route = useRoute();
+const toast = useToastStore();
 const addresses = ref<Address[]>([]);
 const favorites = ref<FavoriteItem[]>([]);
 const orders = ref<OrderData[]>([]);
@@ -240,12 +250,13 @@ async function submitAddress() {
     }
     addresses.value = await addressApi.list();
     resetAddressForm();
+    toast.success(editingAddressId.value ? '地址修改成功' : '地址添加成功');
     const redirect = route.query.redirect as string | undefined;
     if (redirect) {
       router.push(redirect);
     }
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   } finally {
     addressSubmitting.value = false;
   }
@@ -261,8 +272,9 @@ async function setDefaultAddress(item: Address) {
       isDefault: true,
     });
     addresses.value = await addressApi.list();
+    toast.success('默认地址已更新');
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   }
 }
 
@@ -271,8 +283,9 @@ async function deleteAddress(id: number) {
     await addressApi.remove(id);
     addresses.value = await addressApi.list();
     if (editingAddressId.value === id) resetAddressForm();
+    toast.success('地址已删除');
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   }
 }
 
@@ -280,8 +293,9 @@ async function cancelFavorite(productId: number) {
   try {
     await favoriteApi.remove(productId);
     favorites.value = await favoriteApi.list();
+    toast.success('已取消收藏');
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   }
 }
 
@@ -291,7 +305,7 @@ function logout() {
 }
 
 onMounted(() => {
-  loadData().catch((error) => alert((error as Error).message));
+  loadData().catch((error) => toast.error((error as Error).message));
   if (route.query.tab === 'address') {
     setTimeout(() => {
       document.getElementById('address')?.scrollIntoView({ behavior: 'smooth', block: 'start' });

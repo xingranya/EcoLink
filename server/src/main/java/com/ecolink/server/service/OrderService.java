@@ -168,6 +168,8 @@ public class OrderService {
                 order.getReceiverPhone(),
                 order.getReceiverAddress(),
                 order.getPaidAt(),
+                order.getShippedAt(),
+                order.getCompletedAt(),
                 order.getCreatedAt(),
                 itemResponses
         );

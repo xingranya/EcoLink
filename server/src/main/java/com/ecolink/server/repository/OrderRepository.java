@@ -17,4 +17,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByStatusAndShippedAtBefore(OrderStatus status, LocalDateTime shippedAt);
     Page<Order> findByOrderNoContaining(String orderNo, Pageable pageable);
     Page<Order> findByStatus(OrderStatus status, Pageable pageable);
+    Page<Order> findByOrderNoContainingAndStatus(String orderNo, OrderStatus status, Pageable pageable);
+    long countByStatus(OrderStatus status);
+    List<Order> findTop5ByOrderByCreatedAtDescIdDesc();
 }

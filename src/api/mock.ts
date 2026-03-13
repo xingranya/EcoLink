@@ -37,7 +37,7 @@ interface DemoDb {
   };
 }
 
-const STORAGE_KEY = 'ecolink_demo_db_v1';
+const STORAGE_KEY = 'ecolink_demo_db_v2';
 
 function deepClone<T>(data: T): T {
   return JSON.parse(JSON.stringify(data)) as T;
@@ -269,17 +269,20 @@ function buildSeedProducts(): ProductDetail[] {
       ],
       detail: '精选春茶，礼盒装适合自饮与送礼。',
     },
-  ];
+  ].map((item) => ({
+    ...item,
+    status: [5, 12].includes(item.id) ? 'OFF_SALE' : 'ON_SALE',
+  }));
 }
 
 function buildInitialDb(): DemoDb {
   const categories: Category[] = [
-    { id: 1, name: '新鲜瓜果' },
-    { id: 2, name: '时令蔬菜' },
-    { id: 3, name: '肉禽蛋奶' },
-    { id: 4, name: '地方特产' },
-    { id: 5, name: '优质粮油' },
-    { id: 6, name: '茶饮冲调' },
+    { id: 1, name: '新鲜瓜果', sort: 1, enabled: true },
+    { id: 2, name: '时令蔬菜', sort: 2, enabled: true },
+    { id: 3, name: '肉禽蛋奶', sort: 3, enabled: true },
+    { id: 4, name: '地方特产', sort: 4, enabled: true },
+    { id: 5, name: '优质粮油', sort: 5, enabled: true },
+    { id: 6, name: '茶饮冲调', sort: 6, enabled: true },
   ];
   const products = buildSeedProducts();
   const now = new Date().toISOString();
@@ -297,7 +300,8 @@ function buildInitialDb(): DemoDb {
 
   return {
     users: [
-      { id: 1, username: 'demo', password: '123456', nickname: '演示用户', phone: '13800000000' },
+      { id: 1, username: 'demo', password: '123456', nickname: '生态用户', phone: '13800000000', role: 'USER' },
+      { id: 2, username: 'admin', password: 'admin123', nickname: '超级管理员', phone: '', role: 'ADMIN' },
     ],
     categories,
     products,
@@ -354,7 +358,7 @@ function buildInitialDb(): DemoDb {
       ],
     },
     seq: {
-      userId: 2,
+      userId: 3,
       cartItemId: 2,
       addressId: 2,
       orderId: 2,
@@ -408,6 +412,14 @@ function requireLogin(db: DemoDb) {
   return user;
 }
 
+function requireAdmin(db: DemoDb) {
+  const user = requireLogin(db);
+  if (user.role !== 'ADMIN') {
+    throw new Error('需要管理员权限');
+  }
+  return user;
+}
+
 function getProductOrThrow(db: DemoDb, productId: number) {
   const product = db.products.find((item) => item.id === productId);
   if (!product) {
@@ -446,6 +458,33 @@ function getUserOrders(db: DemoDb, userId: number) {
     db.orders[key] = [];
   }
   return db.orders[key];
+}
+
+function getAllOrders(db: DemoDb) {
+  return Object.values(db.orders)
+    .flat()
+    .slice()
+    .sort((a, b) => b.id - a.id);
+}
+
+function paginate<T>(rows: T[], params: Record<string, unknown>, defaultSize = 10) {
+  const page = Math.max(0, toNumber(params.page, 0));
+  const size = Math.max(1, toNumber(params.size, defaultSize));
+  const start = page * size;
+  return {
+    content: rows.slice(start, start + size),
+    totalElements: rows.length,
+    totalPages: Math.max(1, Math.ceil(rows.length / size)),
+    number: page,
+  };
+}
+
+function toAdminProductRow(db: DemoDb, product: ProductDetail & { status?: string }) {
+  const category = db.categories.find((item) => item.id === product.categoryId);
+  return {
+    ...product,
+    category: category ? { id: category.id, name: category.name } : null,
+  };
 }
 
 function toCartData(items: CartItem[]): CartData {
@@ -577,6 +616,7 @@ export async function mockRequest<T>(
         password: payload.password,
         nickname: payload.nickname,
         phone: payload.phone || '',
+        role: 'USER',
       };
       db.users.push(user);
       db.carts[keyByUser(user.id)] = [];
@@ -595,9 +635,261 @@ export async function mockRequest<T>(
       return deepClone(toPublicUser(user)) as T;
     }
 
+    if (chunks[0] === 'admin') {
+      requireAdmin(db);
+      const adminRoute = `/${chunks.slice(1).join('/')}`;
+
+      if (method === 'get' && adminRoute === '/dashboard') {
+        const allOrders = getAllOrders(db);
+        const revenueAmount = Number(
+          allOrders
+            .filter((item) => item.status !== 'UNPAID')
+            .reduce((sum, item) => sum + Number(item.totalAmount), 0)
+            .toFixed(2),
+        );
+        const recentOrders = allOrders.slice(0, 5).map((item) => ({
+          id: item.id,
+          orderNo: item.orderNo,
+          status: item.status,
+          receiverName: item.receiverName,
+          totalAmount: item.totalAmount,
+          createdAt: item.createdAt,
+        }));
+        const hotProducts = db.products
+          .slice()
+          .sort((a, b) => b.sales - a.sales)
+          .slice(0, 5)
+          .map((item) => ({
+            id: item.id,
+            name: item.name,
+            sales: item.sales,
+            stock: item.stock,
+            status: item.status || 'ON_SALE',
+            mainImage: item.mainImage,
+          }));
+
+        await sleep();
+        return deepClone({
+          productCount: db.products.length,
+          orderCount: allOrders.length,
+          userCount: db.users.length,
+          categoryCount: db.categories.length,
+          onSaleProductCount: db.products.filter((item) => item.status !== 'OFF_SALE').length,
+          offSaleProductCount: db.products.filter((item) => item.status === 'OFF_SALE').length,
+          lowStockProductCount: db.products.filter((item) => item.stock <= 50).length,
+          unpaidOrderCount: allOrders.filter((item) => item.status === 'UNPAID').length,
+          paidOrderCount: allOrders.filter((item) => item.status === 'PAID').length,
+          shippedOrderCount: allOrders.filter((item) => item.status === 'SHIPPED').length,
+          completedOrderCount: allOrders.filter((item) => item.status === 'COMPLETED').length,
+          revenueAmount,
+          recentOrders,
+          hotProducts,
+        }) as T;
+      }
+
+      if (chunks[1] === 'categories') {
+        if (method === 'get' && adminRoute === '/categories') {
+          const rows = db.categories.slice().sort((a, b) => (a.sort || 0) - (b.sort || 0) || a.id - b.id);
+          await sleep();
+          return deepClone(rows) as T;
+        }
+
+        if (method === 'post' && adminRoute === '/categories') {
+          const payload = data as { name?: string; sort?: number; enabled?: boolean };
+          const category: Category = {
+            id: db.categories.length ? Math.max(...db.categories.map((item) => item.id)) + 1 : 1,
+            name: String(payload.name || '').trim(),
+            sort: toNumber(payload.sort, 0),
+            enabled: payload.enabled !== false,
+          };
+          db.categories.push(category);
+          writeDb(db);
+          await sleep();
+          return deepClone(category) as T;
+        }
+
+        if (chunks[2] && method === 'put') {
+          const id = Number(chunks[2]);
+          const payload = data as { name?: string; sort?: number; enabled?: boolean };
+          const target = db.categories.find((item) => item.id === id);
+          if (!target) {
+            return fail('分类不存在');
+          }
+          target.name = String(payload.name || target.name).trim();
+          target.sort = toNumber(payload.sort, target.sort || 0);
+          target.enabled = payload.enabled ?? target.enabled ?? true;
+          db.products.forEach((item) => {
+            if (item.categoryId === id) {
+              item.categoryName = target.name;
+            }
+          });
+          writeDb(db);
+          await sleep();
+          return deepClone(target) as T;
+        }
+
+        if (chunks[2] && method === 'delete') {
+          const id = Number(chunks[2]);
+          db.categories = db.categories.filter((item) => item.id !== id);
+          writeDb(db);
+          await sleep();
+          return deepClone({ ok: true }) as T;
+        }
+      }
+
+      if (chunks[1] === 'products') {
+        if (method === 'get' && adminRoute === '/products') {
+          const query = (params || {}) as Record<string, unknown>;
+          const keyword = String(query.keyword || '').trim().toLowerCase();
+          const categoryId = toNumber(query.categoryId, 0);
+          const status = String(query.status || '').trim();
+
+          let rows = db.products.slice();
+          if (keyword) {
+            rows = rows.filter((item) => `${item.name} ${item.subtitle || ''}`.toLowerCase().includes(keyword));
+          }
+          if (categoryId) {
+            rows = rows.filter((item) => item.categoryId === categoryId);
+          }
+          if (status) {
+            rows = rows.filter((item) => (item.status || 'ON_SALE') === status);
+          }
+
+          const paged = paginate(rows.map((item) => toAdminProductRow(db, item)), query);
+          await sleep();
+          return deepClone(paged) as T;
+        }
+
+        if (chunks[2] && method === 'get') {
+          const id = Number(chunks[2]);
+          const product = db.products.find((item) => item.id === id);
+          if (!product) {
+            return fail('商品不存在');
+          }
+          await sleep();
+          return deepClone(toAdminProductRow(db, product)) as T;
+        }
+
+        if (method === 'post' && adminRoute === '/products') {
+          const payload = data as Record<string, unknown>;
+          const category = db.categories.find((item) => item.id === Number(payload.categoryId));
+          if (!category) {
+            return fail('分类不存在');
+          }
+          const product = {
+            id: db.products.length ? Math.max(...db.products.map((item) => item.id)) + 1 : 1,
+            categoryId: category.id,
+            categoryName: category.name,
+            name: String(payload.name || '').trim(),
+            subtitle: String(payload.subtitle || '').trim(),
+            price: Number(payload.price || 0),
+            stock: toNumber(payload.stock, 0),
+            sales: 0,
+            mainImage: String(payload.mainImage || '').trim(),
+            detail: String(payload.detail || '').trim(),
+            images: [String(payload.mainImage || '').trim()].filter(Boolean),
+            status: String(payload.status || 'ON_SALE'),
+          } as ProductDetail & { status?: string };
+          db.products.unshift(product);
+          writeDb(db);
+          await sleep();
+          return deepClone(toAdminProductRow(db, product)) as T;
+        }
+
+        if (chunks[2] && method === 'put') {
+          const id = Number(chunks[2]);
+          const payload = data as Record<string, unknown>;
+          const product = db.products.find((item) => item.id === id);
+          if (!product) {
+            return fail('商品不存在');
+          }
+          const category = db.categories.find((item) => item.id === Number(payload.categoryId));
+          if (!category) {
+            return fail('分类不存在');
+          }
+          product.categoryId = category.id;
+          product.categoryName = category.name;
+          product.name = String(payload.name || product.name).trim();
+          product.subtitle = String(payload.subtitle || '').trim();
+          product.price = Number(payload.price || product.price);
+          product.stock = toNumber(payload.stock, product.stock);
+          product.mainImage = String(payload.mainImage || '').trim();
+          product.detail = String(payload.detail || '').trim();
+          product.images = [product.mainImage].filter(Boolean);
+          product.status = String(payload.status || product.status || 'ON_SALE');
+          writeDb(db);
+          await sleep();
+          return deepClone(toAdminProductRow(db, product)) as T;
+        }
+
+        if (chunks[2] && method === 'delete') {
+          const id = Number(chunks[2]);
+          db.products = db.products.filter((item) => item.id !== id);
+          writeDb(db);
+          await sleep();
+          return deepClone({ ok: true }) as T;
+        }
+      }
+
+      if (chunks[1] === 'orders') {
+        const allOrders = getAllOrders(db);
+
+        if (method === 'get' && adminRoute === '/orders') {
+          const query = (params || {}) as Record<string, unknown>;
+          const orderNo = String(query.orderNo || '').trim().toLowerCase();
+          const status = String(query.status || '').trim();
+
+          let rows = allOrders;
+          if (orderNo) {
+            rows = rows.filter((item) => item.orderNo.toLowerCase().includes(orderNo));
+          }
+          if (status) {
+            rows = rows.filter((item) => item.status === status);
+          }
+
+          const paged = paginate(rows, query);
+          await sleep();
+          return deepClone(paged) as T;
+        }
+
+        if (chunks[2] && method === 'get') {
+          const id = Number(chunks[2]);
+          const order = allOrders.find((item) => item.id === id);
+          if (!order) {
+            return fail('订单不存在');
+          }
+          await sleep();
+          return deepClone({ order, items: order.items }) as T;
+        }
+
+        if (chunks[2] && chunks[3] === 'status' && method === 'put') {
+          const id = Number(chunks[2]);
+          const payload = data as { status?: string };
+          const order = allOrders.find((item) => item.id === id);
+          if (!order) {
+            return fail('订单不存在');
+          }
+          order.status = String(payload.status || order.status) as OrderData['status'];
+          const now = new Date().toISOString();
+          if (order.status === 'PAID' && !order.paidAt) {
+            order.paidAt = now;
+          }
+          if (order.status === 'SHIPPED') {
+            order.shippedAt = now;
+          }
+          if (order.status === 'COMPLETED') {
+            order.completedAt = now;
+          }
+          writeDb(db);
+          await sleep();
+          return deepClone({ ok: true }) as T;
+        }
+      }
+    }
+
     if (method === 'get' && route === '/categories') {
       await sleep();
-      return deepClone(db.categories) as T;
+      return deepClone(db.categories.filter((item) => item.enabled !== false).map(({ id, name }) => ({ id, name }))) as T;
     }
 
     if (method === 'get' && route === '/products') {

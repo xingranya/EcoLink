@@ -60,6 +60,78 @@
         </div>
       </section>
 
+      <section class="mx-auto max-w-7xl px-4 pb-2 sm:px-6 lg:px-8">
+        <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+          <article class="rounded-[2rem] border border-primary/10 bg-white p-6 shadow-sm">
+            <p class="text-xs font-bold uppercase tracking-[0.28em] text-primary/60">生态鲜选</p>
+            <h2 class="mt-3 text-2xl font-black tracking-tight text-slate-900 lg:text-3xl">把新鲜、安心和产地风味带回餐桌</h2>
+            <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+              从应季蔬果到地方特产，EcoLink 按原产地、时令与品质标准甄选商品，让日常采购更省心，也让每一份食材来源更清楚。
+            </p>
+
+            <div class="mt-5 grid gap-4 sm:grid-cols-2">
+              <article
+                v-for="highlight in homeHighlights"
+                :key="highlight.title"
+                class="rounded-3xl border border-slate-200 bg-slate-50 p-5 transition-all hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <div class="flex items-start justify-between gap-4">
+                  <div>
+                    <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">{{ highlight.eyebrow }}</p>
+                    <h3 class="mt-3 text-lg font-black text-slate-900">{{ highlight.title }}</h3>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">{{ highlight.description }}</p>
+                  </div>
+                  <span class="material-symbols-outlined rounded-2xl bg-white p-3 text-slate-700 shadow-sm">{{ highlight.icon }}</span>
+                </div>
+                <div class="mt-4 flex flex-wrap gap-2">
+                  <span
+                    v-for="tag in highlight.tags"
+                    :key="tag"
+                    class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600"
+                  >
+                    {{ tag }}
+                  </span>
+                </div>
+              </article>
+            </div>
+          </article>
+
+          <aside class="space-y-4">
+            <article class="rounded-[2rem] border border-primary/10 bg-white p-6 shadow-sm">
+              <p class="text-xs font-bold uppercase tracking-[0.2em] text-primary/60">逛逛商城</p>
+              <div class="mt-4 space-y-3">
+                <RouterLink
+                  v-for="entry in quickEntries"
+                  :key="entry.title"
+                  :to="entry.to"
+                  class="flex items-start gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 transition-all hover:-translate-y-0.5 hover:bg-white hover:shadow-sm"
+                >
+                  <span class="material-symbols-outlined rounded-2xl bg-white p-3 text-slate-700 shadow-sm">{{ entry.icon }}</span>
+                  <div>
+                    <p class="text-sm font-bold text-slate-900">{{ entry.title }}</p>
+                    <p class="mt-1 text-xs leading-5 text-slate-500">{{ entry.description }}</p>
+                  </div>
+                </RouterLink>
+              </div>
+            </article>
+
+            <article class="rounded-[2rem] border border-emerald-200 bg-emerald-50 p-6 shadow-sm">
+              <p class="text-xs font-bold uppercase tracking-[0.2em] text-emerald-700/70">购物安心</p>
+              <div class="mt-4 space-y-3">
+                <div
+                  v-for="promise in shoppingPromises"
+                  :key="promise.title"
+                  class="rounded-2xl bg-white/90 p-4"
+                >
+                  <p class="text-sm font-bold text-slate-900">{{ promise.title }}</p>
+                  <p class="mt-1 text-xs leading-5 text-slate-500">{{ promise.description }}</p>
+                </div>
+              </div>
+            </article>
+          </aside>
+        </div>
+      </section>
+
       <section class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div class="mb-8 flex items-end justify-between gap-3">
           <div>
@@ -188,11 +260,15 @@
 import { computed, onMounted, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import { cartApi, productApi } from '@/api';
+import { useAuthStore } from '@/stores/auth';
 import { useCartStore } from '@/stores/cart';
+import { useToastStore } from '@/stores/toast';
 import type { Category, ProductItem } from '@/types/api';
 
 const router = useRouter();
+const auth = useAuthStore();
 const cart = useCartStore();
+const toast = useToastStore();
 const categories = ref<Category[]>([]);
 const products = ref<ProductItem[]>([]);
 const loading = ref(false);
@@ -219,6 +295,73 @@ const categoryCards = computed(() =>
   }),
 );
 
+const homeHighlights = computed(() => [
+  {
+    eyebrow: 'Fresh Picks',
+    title: '当季鲜蔬水果',
+    description: '围绕时令与产地挑选每日食材，让餐桌更新鲜，也更适合日常采购。',
+    icon: 'search',
+    tags: ['时令上新', '新鲜直达', '每日采购'],
+  },
+  {
+    eyebrow: 'Origin',
+    title: '原产地风味特产',
+    description: '汇集来自不同产区的特色好物，把地方风味和生态品质一起送到用户手中。',
+    icon: 'location_on',
+    tags: ['地方特产', '原产地直采', '风味优选'],
+  },
+  {
+    eyebrow: 'Traceability',
+    title: '批次溯源信息',
+    description: '商品详情展示产地、批次和履约信息，购买前就能看清食材来源。',
+    icon: 'qr_code_2',
+    tags: ['产地信息', '批次编号', '来源可查'],
+  },
+  {
+    eyebrow: 'Service',
+    title: '冷链配送保障',
+    description: '围绕生鲜场景提供冷链配送、品质承诺和订单跟踪，收货体验更稳定。',
+    icon: 'local_shipping',
+    tags: ['冷链配送', '品质保障', '订单可查'],
+  },
+]);
+
+const quickEntries = computed(() => [
+  {
+    title: '选购商品',
+    description: '浏览全部分类，按关键词或类型快速找到想买的商品。',
+    icon: 'storefront',
+    to: '/search',
+  },
+  {
+    title: auth.isLogin ? '我的订单' : '立即登录',
+    description: auth.isLogin ? '查看订单状态、支付结果和配送进度。' : '登录后可管理购物车、订单和收货信息。',
+    icon: auth.isLogin ? 'receipt_long' : 'login',
+    to: auth.isLogin ? '/orders' : '/login',
+  },
+  {
+    title: '会员中心',
+    description: '查看个人资料、收货地址和账户相关信息。',
+    icon: 'person',
+    to: '/profile',
+  },
+]);
+
+const shoppingPromises = [
+  {
+    title: '严选生态产地',
+    description: '围绕生态种植和产地标准筛选商品，减少日常采购中的选择成本。',
+  },
+  {
+    title: '配送进度可跟踪',
+    description: '下单后可在订单页查看支付、发货和完成等关键状态变化。',
+  },
+  {
+    title: '购买信息更透明',
+    description: '商品详情提供产地、规格、库存和溯源信息，帮助用户放心下单。',
+  },
+];
+
 async function loadData() {
   loading.value = true;
   try {
@@ -239,13 +382,13 @@ async function addCart(productId: number) {
   try {
     await cartApi.add({ productId, quantity: 1 });
     cart.reload().catch(() => undefined);
-    alert('已加入购物车');
+    toast.success('已加入购物车');
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   }
 }
 
 onMounted(() => {
-  loadData().catch((error) => alert((error as Error).message));
+  loadData().catch((error) => toast.error((error as Error).message));
 });
 </script>

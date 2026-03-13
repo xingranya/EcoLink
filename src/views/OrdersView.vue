@@ -40,6 +40,23 @@
             </div>
           </div>
 
+          <div class="border-b border-primary/5 bg-slate-50 px-4 py-4 md:px-6">
+            <div class="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">
+              <span>订单进度</span>
+              <span class="material-symbols-outlined text-sm text-primary/60">timeline</span>
+            </div>
+            <div class="mt-4 grid grid-cols-4 gap-2">
+              <div
+                v-for="step in orderSteps"
+                :key="step.key"
+                class="rounded-xl px-3 py-3 text-center"
+                :class="stepStateClass(order.status, step.key)"
+              >
+                <p class="text-xs font-bold">{{ step.label }}</p>
+              </div>
+            </div>
+          </div>
+
           <div class="space-y-4 p-4 md:p-6">
             <div v-for="item in order.items" :key="item.id" class="flex items-center gap-4">
               <img :src="item.productImage || fallbackImage" :alt="item.productName" class="h-20 w-20 flex-shrink-0 rounded-lg object-cover" loading="lazy" />
@@ -68,6 +85,14 @@
               <div v-if="order.paidAt" class="flex gap-2">
                 <dt class="text-slate-500">支付时间:</dt>
                 <dd class="font-medium">{{ formatTime(order.paidAt) }}</dd>
+              </div>
+              <div v-if="order.shippedAt" class="flex gap-2">
+                <dt class="text-slate-500">发货时间:</dt>
+                <dd class="font-medium">{{ formatTime(order.shippedAt) }}</dd>
+              </div>
+              <div v-if="order.completedAt" class="flex gap-2">
+                <dt class="text-slate-500">完成时间:</dt>
+                <dd class="font-medium">{{ formatTime(order.completedAt) }}</dd>
               </div>
             </dl>
           </div>
@@ -107,15 +132,23 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { orderApi } from '@/api';
+import { useToastStore } from '@/stores/toast';
 import type { OrderData, OrderStatus } from '@/types/api';
 
 const route = useRoute();
 const router = useRouter();
+const toast = useToastStore();
 const orders = ref<OrderData[]>([]);
 const loading = ref(false);
 const expandedOrderId = ref(0);
 const activeTab = ref<'all' | 'UNPAID' | 'PAID' | 'SHIPPED' | 'COMPLETED'>('all');
 const fallbackImage = 'https://images.unsplash.com/photo-1608797178974-15b35a64ede9?auto=format&fit=crop&w=1200&q=80';
+const orderSteps: Array<{ key: OrderStatus; label: string }> = [
+  { key: 'UNPAID', label: '待支付' },
+  { key: 'PAID', label: '已支付' },
+  { key: 'SHIPPED', label: '已发货' },
+  { key: 'COMPLETED', label: '已完成' },
+];
 
 const tabs = [
   { key: 'all', label: '全部订单' },
@@ -151,6 +184,16 @@ function statusClass(status: OrderStatus) {
   return 'bg-slate-200 text-slate-700';
 }
 
+function stepStateClass(status: OrderStatus, step: OrderStatus) {
+  const order = ['UNPAID', 'PAID', 'SHIPPED', 'COMPLETED'];
+  const currentIndex = order.indexOf(status);
+  const stepIndex = order.indexOf(step);
+  if (currentIndex >= stepIndex) {
+    return 'bg-primary text-white shadow-md shadow-primary/20';
+  }
+  return 'bg-white text-slate-400 ring-1 ring-slate-200';
+}
+
 async function loadOrders() {
   loading.value = true;
   try {
@@ -174,6 +217,6 @@ onMounted(() => {
   if (tab && validTabs.includes(tab)) {
     activeTab.value = tab as typeof activeTab.value;
   }
-  loadOrders().catch((error) => alert((error as Error).message));
+  loadOrders().catch((error) => toast.error((error as Error).message));
 });
 </script>

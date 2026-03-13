@@ -42,7 +42,9 @@ public class AdminOrderController {
             @RequestParam(required = false) String status) {
         PageRequest pageReq = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         Page<Order> result;
-        if (orderNo != null && !orderNo.isBlank()) {
+        if (orderNo != null && !orderNo.isBlank() && status != null && !status.isBlank()) {
+            result = orderRepository.findByOrderNoContainingAndStatus(orderNo, OrderStatus.valueOf(status), pageReq);
+        } else if (orderNo != null && !orderNo.isBlank()) {
             result = orderRepository.findByOrderNoContaining(orderNo, pageReq);
         } else if (status != null && !status.isBlank()) {
             result = orderRepository.findByStatus(OrderStatus.valueOf(status), pageReq);
@@ -59,7 +61,7 @@ public class AdminOrderController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<Map<String, Object>> detail(@PathVariable Long id) {
+    public ApiResponse<Map<String, Object>> detail(@PathVariable long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new BizException(4040, "订单不存在"));
         List<OrderItem> items = orderItemRepository.findByOrderIdOrderByIdAsc(order.getId());
@@ -78,7 +80,7 @@ public class AdminOrderController {
     }
 
     @PutMapping("/{id}/status")
-    public ApiResponse<Void> updateStatus(@PathVariable Long id,
+    public ApiResponse<Void> updateStatus(@PathVariable long id,
                                           @Valid @RequestBody StatusReq req) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new BizException(4040, "订单不存在"));
@@ -98,7 +100,11 @@ public class AdminOrderController {
                 Map.entry("totalAmount", o.getTotalAmount()),
                 Map.entry("receiverName", o.getReceiverName()),
                 Map.entry("receiverPhone", o.getReceiverPhone()),
-                Map.entry("createdAt", o.getCreatedAt() != null ? o.getCreatedAt().toString() : "")
+                Map.entry("receiverAddress", o.getReceiverAddress()),
+                Map.entry("createdAt", o.getCreatedAt() != null ? o.getCreatedAt().toString() : ""),
+                Map.entry("paidAt", o.getPaidAt() != null ? o.getPaidAt().toString() : ""),
+                Map.entry("shippedAt", o.getShippedAt() != null ? o.getShippedAt().toString() : ""),
+                Map.entry("completedAt", o.getCompletedAt() != null ? o.getCompletedAt().toString() : "")
         );
     }
 

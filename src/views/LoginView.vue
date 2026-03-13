@@ -26,6 +26,31 @@
         <h1 class="mb-2 text-3xl font-black text-slate-900">欢迎回来</h1>
         <p class="mb-8 text-sm text-slate-500">请输入您的账号信息以登录</p>
 
+        <div class="mb-6 rounded-2xl border border-primary/10 bg-primary/5 p-4">
+          <p class="text-xs font-bold uppercase tracking-[0.18em] text-primary/70">常用账号</p>
+          <p class="mt-2 text-sm text-slate-600">可直接填充内置账号，便于切换普通用户与管理员两类角色。</p>
+          <div class="mt-4 grid gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              class="rounded-xl border border-white/80 bg-white p-3 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+              @click="fillAccount('demo', '123456')"
+            >
+              <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">普通用户</p>
+              <p class="mt-2 text-sm font-bold text-slate-900">demo / 123456</p>
+              <p class="mt-1 text-xs text-slate-500">搜索商品、加入购物车、下单与支付流程</p>
+            </button>
+            <button
+              type="button"
+              class="rounded-xl border border-white/80 bg-white p-3 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+              @click="fillAccount('admin', 'admin123')"
+            >
+              <p class="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">管理员</p>
+              <p class="mt-2 text-sm font-bold text-slate-900">admin / admin123</p>
+              <p class="mt-1 text-xs text-slate-500">仪表盘总览、商品管理与订单履约</p>
+            </button>
+          </div>
+        </div>
+
         <form class="space-y-5" @submit.prevent="submit">
           <label class="block">
             <span class="mb-1.5 block text-sm font-medium text-slate-700">用户名</span>
@@ -74,13 +99,6 @@
           <RouterLink to="/register" class="font-bold text-primary hover:underline">立即注册</RouterLink>
         </p>
 
-        <div class="mt-6 flex items-start gap-2 rounded-xl bg-primary/5 p-3">
-          <span class="material-symbols-outlined mt-0.5 text-sm text-primary">info</span>
-          <div class="text-xs text-slate-600">
-            <p class="font-bold">演示账号</p>
-            <p>账号: demo / 密码: 123456</p>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -94,10 +112,16 @@ import { useAuthStore } from '@/stores/auth';
 const router = useRouter();
 const route = useRoute();
 const auth = useAuthStore();
-const username = ref('demo');
-const password = ref('123456');
+const username = ref('');
+const password = ref('');
 const loading = ref(false);
 const errorMessage = ref('');
+
+function fillAccount(name: string, pwd: string) {
+  username.value = name;
+  password.value = pwd;
+  errorMessage.value = '';
+}
 
 async function submit() {
   errorMessage.value = '';

@@ -26,11 +26,13 @@
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import { cartApi } from '@/api';
+import { useToastStore } from '@/stores/toast';
 import type { ProductItem } from '@/types/api';
 
 const props = defineProps<{ product: ProductItem }>();
 const emit = defineEmits<{ added: [] }>();
 const adding = ref(false);
+const toast = useToastStore();
 
 const fallbackImage = 'https://images.unsplash.com/photo-1608797178974-15b35a64ede9?auto=format&fit=crop&w=1200&q=80';
 
@@ -41,7 +43,7 @@ async function addCart() {
     await cartApi.add({ productId: props.product.id, quantity: 1 });
     emit('added');
   } catch (error) {
-    alert((error as Error).message);
+    toast.error((error as Error).message);
   } finally {
     adding.value = false;
   }

@@ -1,5 +1,6 @@
 <template>
   <div class="flex min-h-screen flex-col">
+    <AppToast />
     <AppHeader v-if="showChrome" />
     <RouterView />
     <AppFooter v-if="showChrome" />
@@ -11,6 +12,7 @@ import { computed } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
 import AppHeader from '@/components/AppHeader.vue';
 import AppFooter from '@/components/AppFooter.vue';
+import AppToast from '@/components/AppToast.vue';
 
 const route = useRoute();
 const showChrome = computed(() =>

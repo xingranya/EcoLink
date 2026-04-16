@@ -1,0 +1,196 @@
+{
+  "id": "2026-04-16-113951",
+  "generated_at": "2026-04-16T03:39:51.7754014Z",
+  "language": "zh",
+  "pages": [
+    {
+      "slug": "1-xiang-mu-gai-shu",
+      "title": "项目概述",
+      "file": "1-xiang-mu-gai-shu.md",
+      "section": "入门",
+      "level": "Beginner"
+    },
+    {
+      "slug": "2-kuai-su-kai-shi",
+      "title": "快速开始",
+      "file": "2-kuai-su-kai-shi.md",
+      "section": "入门",
+      "level": "Beginner"
+    },
+    {
+      "slug": "3-xi-tong-jia-gou-zong-lan",
+      "title": "系统架构总览",
+      "file": "3-xi-tong-jia-gou-zong-lan.md",
+      "section": "深入探索",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "4-qian-duan-mu-lu-jie-gou-yu-mo-kuai-hua-fen",
+      "title": "前端目录结构与模块划分",
+      "file": "4-qian-duan-mu-lu-jie-gou-yu-mo-kuai-hua-fen.md",
+      "section": "深入探索",
+      "group": "前端技术栈",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "5-vue-router-lu-you-yu-quan-xian-shou-wei",
+      "title": "Vue Router 路由与权限守卫",
+      "file": "5-vue-router-lu-you-yu-quan-xian-shou-wei.md",
+      "section": "深入探索",
+      "group": "前端技术栈",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "6-pinia-zhuang-tai-guan-li-yu-ren-zheng-cun-chu",
+      "title": "Pinia 状态管理与认证存储",
+      "file": "6-pinia-zhuang-tai-guan-li-yu-ren-zheng-cun-chu.md",
+      "section": "深入探索",
+      "group": "前端技术栈",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "7-axios-feng-zhuang-yu-mock-hui-tui-ji-zhi",
+      "title": "Axios 封装与 Mock 回退机制",
+      "file": "7-axios-feng-zhuang-yu-mock-hui-tui-ji-zhi.md",
+      "section": "深入探索",
+      "group": "前端技术栈",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "8-hou-duan-fen-ceng-jia-gou-she-ji",
+      "title": "后端分层架构设计",
+      "file": "8-hou-duan-fen-ceng-jia-gou-she-ji.md",
+      "section": "深入探索",
+      "group": "后端技术栈",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "9-spring-data-jpa-shu-ju-chi-jiu-hua",
+      "title": "Spring Data JPA 数据持久化",
+      "file": "9-spring-data-jpa-shu-ju-chi-jiu-hua.md",
+      "section": "深入探索",
+      "group": "后端技术栈",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "10-jwt-ren-zheng-yu-token-sheng-cheng-jie-xi",
+      "title": "JWT 认证与 Token 生成解析",
+      "file": "10-jwt-ren-zheng-yu-token-sheng-cheng-jie-xi.md",
+      "section": "深入探索",
+      "group": "后端技术栈",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "11-shu-ju-ku-biao-jie-gou-yu-er-mo-xing",
+      "title": "数据库表结构与 ER 模型",
+      "file": "11-shu-ju-ku-biao-jie-gou-yu-er-mo-xing.md",
+      "section": "深入探索",
+      "group": "数据库设计",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "12-flyway-shu-ju-ku-qian-yi-guan-li",
+      "title": "Flyway 数据库迁移管理",
+      "file": "12-flyway-shu-ju-ku-qian-yi-guan-li.md",
+      "section": "深入探索",
+      "group": "数据库设计",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "13-shang-pin-liu-lan-yu-sou-suo-guo-lu",
+      "title": "商品浏览与搜索过滤",
+      "file": "13-shang-pin-liu-lan-yu-sou-suo-guo-lu.md",
+      "section": "深入探索",
+      "group": "核心业务",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "14-gou-wu-che-guan-li",
+      "title": "购物车管理",
+      "file": "14-gou-wu-che-guan-li.md",
+      "section": "深入探索",
+      "group": "核心业务",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "15-ding-dan-chuang-jian-yu-zhi-fu-liu-cheng",
+      "title": "订单创建与支付流程",
+      "file": "15-ding-dan-chuang-jian-yu-zhi-fu-liu-cheng.md",
+      "section": "深入探索",
+      "group": "核心业务",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "16-ding-dan-zhuang-tai-zi-dong-liu-zhuan-ji-zhi",
+      "title": "订单状态自动流转机制",
+      "file": "16-ding-dan-zhuang-tai-zi-dong-liu-zhuan-ji-zhi.md",
+      "section": "深入探索",
+      "group": "核心业务",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "17-restful-api-she-ji-gui-fan",
+      "title": "RESTful API 设计规范",
+      "file": "17-restful-api-she-ji-gui-fan.md",
+      "section": "深入探索",
+      "group": "接口与安全",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "18-spring-security-quan-xian-pei-zhi",
+      "title": "Spring Security 权限配置",
+      "file": "18-spring-security-quan-xian-pei-zhi.md",
+      "section": "深入探索",
+      "group": "接口与安全",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "19-cors-kua-yu-yu-an-quan-ce-lue",
+      "title": "CORS 跨域与安全策略",
+      "file": "19-cors-kua-yu-yu-an-quan-ce-lue.md",
+      "section": "深入探索",
+      "group": "接口与安全",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "20-guan-li-yuan-yi-biao-pan",
+      "title": "管理员仪表盘",
+      "file": "20-guan-li-yuan-yi-biao-pan.md",
+      "section": "深入探索",
+      "group": "后台管理",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "21-shang-pin-yu-fen-lei-guan-li",
+      "title": "商品与分类管理",
+      "file": "21-shang-pin-yu-fen-lei-guan-li.md",
+      "section": "深入探索",
+      "group": "后台管理",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "22-ding-dan-guan-li-yu-zhuang-tai-cao-zuo",
+      "title": "订单管理与状态操作",
+      "file": "22-ding-dan-guan-li-yu-zhuang-tai-cao-zuo.md",
+      "section": "深入探索",
+      "group": "后台管理",
+      "level": "Intermediate"
+    },
+    {
+      "slug": "23-huan-jing-pei-zhi-yu-bu-shu-fang-an",
+      "title": "环境配置与部署方案",
+      "file": "23-huan-jing-pei-zhi-yu-bu-shu-fang-an.md",
+      "section": "深入探索",
+      "group": "部署运维",
+      "level": "Advanced"
+    },
+    {
+      "slug": "24-xing-neng-you-hua-yu-kuo-zhan-xing-fen-xi",
+      "title": "性能优化与扩展性分析",
+      "file": "24-xing-neng-you-hua-yu-kuo-zhan-xing-fen-xi.md",
+      "section": "深入探索",
+      "group": "部署运维",
+      "level": "Advanced"
+    }
+  ]
+}
